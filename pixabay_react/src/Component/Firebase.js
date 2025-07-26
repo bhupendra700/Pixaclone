@@ -6,7 +6,7 @@ import { getAuth } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCMZz7A4EBInL43UGTPC8nJC2ie6GAHGfo",
+  apiKey: import.meta.env.VITE_API_KEY_FIRE,
   authDomain: "pixaclone-a9042.firebaseapp.com",
   projectId: "pixaclone-a9042",
   storageBucket: "pixaclone-a9042.firebasestorage.app",
