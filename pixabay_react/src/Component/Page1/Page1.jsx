@@ -6,8 +6,8 @@ import { useLocation, useSearchParams } from "react-router-dom";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 const Page1 = () => {
-  
   const loc = useLocation();
+  
   const [searchParam] = useSearchParams();
   
    //for safe search
@@ -50,6 +50,10 @@ const Page1 = () => {
       setFetchedData(data);
     }
   },[data])
+
+  useEffect(()=>{
+    document.title = `Home-${loc.pathname === "/" ? "Images" : loc.pathname.slice(1 , 2).toUpperCase()+loc.pathname.slice(2,-1)}`;
+  },[loc.pathname])
 
   useEffect(() => {
     if (error) {

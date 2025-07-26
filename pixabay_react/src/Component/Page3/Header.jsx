@@ -30,13 +30,13 @@ const Header = ({ safeSearch, setSafeSearch, authTrace, setAuthTrace, user, setU
             document.body.setAttribute("class", "hidescroll");
         } else if (authTrace !== "") {
             document.body.setAttribute("class", "hidescroll");
-        } else if(isForgot){
+        } else if (isForgot) {
             document.body.setAttribute("class", "hidescroll");
-        }else if(profile){
+        } else if (profile) {
             document.body.setAttribute("class", "hidescroll");
-        }else if(showDelete){
+        } else if (showDelete) {
             document.body.setAttribute("class", "hidescroll");
-        }else {
+        } else {
             document.body.removeAttribute("class")
         }
     }, [size, hemSlider]);
@@ -133,7 +133,15 @@ const Header = ({ safeSearch, setSafeSearch, authTrace, setAuthTrace, user, setU
                     user ?
                         <>
                             <details className='user' id='det2' open={hemSlider.track === "user" ? hemSlider.open : false}>
-                                <summary onClick={(e) => { e.preventDefault(); setHemSlider({ ...hemSlider, track: "user", open: hemSlider.track === "user" ? !hemSlider.open : true }) }}><img src={user?.photoURL ? JSON.parse(user.photoURL)?.userLink : "https://res.cloudinary.com/dgun0lg7q/image/upload/v1752855927/1_wjyymp.jpg"} /></summary>
+                                <summary onClick={(e) => { e.preventDefault(); setHemSlider({ ...hemSlider, track: "user", open: hemSlider.track === "user" ? !hemSlider.open : true }) }}><img src={(() => {
+                                    try {
+                                        if (user?.photoURL) {
+                                            return JSON.parse(user?.photoURL)?.userLink
+                                        }
+                                    } catch (error) {
+                                        return "https://res.cloudinary.com/dgun0lg7q/image/upload/v1752855927/1_wjyymp.jpg"
+                                    }
+                                })()} /></summary>
                                 {size > 750 && <div className='profile'>
                                     <div className='name'>{user.displayName ? user.displayName : "UnKnown"}</div>
                                     <div className='box'>{user.email}</div>
@@ -196,7 +204,15 @@ const Header = ({ safeSearch, setSafeSearch, authTrace, setAuthTrace, user, setU
                         </div>}
                         {hemSlider.track === "user" && <div className="accaunt-logo">
                             <div className='account-img'>
-                                {user && <img src={user.photoURL ? JSON.parse(user.photoURL).userLink : "https://res.cloudinary.com/dgun0lg7q/image/upload/v1752855926/3_f3pgm3.jpg"} alt="pattern" />}
+                                {user && <img src={(() => {
+                                    try {
+                                        if (user?.photoURL) {
+                                            return JSON.parse(user?.photoURL)?.userLink
+                                        }
+                                    } catch (error) {
+                                        return "https://res.cloudinary.com/dgun0lg7q/image/upload/v1752855927/1_wjyymp.jpg"
+                                    }
+                                })()} alt="pattern" />}
                             </div>
                             {user && <div className='account-name'>{user.displayName ? user.displayName : "UnKnown"}</div>}
                         </div>}

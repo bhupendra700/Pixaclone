@@ -125,6 +125,15 @@ const Hero = ({ setSafeSearch, safeSearch }) => {
 
     const [authTrace, setAuthTrace] = useState("");
 
+    useEffect(() => {
+        if (user) {
+            if (authTrace !== "") {
+                setAuthTrace("")
+                document.body.removeAttribute("class")
+            }
+        }
+    }, [user])
+
     const [hemSlider, setHemSlider] = useState({ track: "unknown", open: false });
 
     useEffect(() => {
@@ -177,6 +186,12 @@ const Hero = ({ setSafeSearch, safeSearch }) => {
     const [showDelete, setShowDelete] = useState(false)
 
     const [isForgot, setIsForgot] = useState(false)
+
+    useEffect(() => {
+        if (auth.currentUser) {
+            setUser(auth.currentUser)
+        }
+    }, [authTrace])
 
     return <>
         <div className="hero-container">
@@ -241,7 +256,15 @@ const Hero = ({ setSafeSearch, safeSearch }) => {
                     user ?
                         <>
                             <details className='user' id='det2' open={hemSlider.track === "user" ? hemSlider.open : false}>
-                                <summary onClick={(e) => { e.preventDefault(); setHemSlider({ ...hemSlider, track: "user", open: hemSlider.track === "user" ? !hemSlider.open : true }) }}><img src={user?.photoURL ? JSON.parse(user.photoURL)?.userLink : "https://res.cloudinary.com/dgun0lg7q/image/upload/v1752855927/1_wjyymp.jpg"} /></summary>
+                                <summary onClick={(e) => { e.preventDefault(); setHemSlider({ ...hemSlider, track: "user", open: hemSlider.track === "user" ? !hemSlider.open : true }) }}><img src={(() => {
+                                    try {
+                                        if (user?.photoURL) {
+                                            return JSON.parse(user?.photoURL)?.userLink
+                                        }
+                                    } catch (error) {
+                                        return "https://res.cloudinary.com/dgun0lg7q/image/upload/v1752855927/1_wjyymp.jpg"
+                                    }
+                                })()} /></summary>
                                 {size > 750 && <div className='profile'>
                                     <div className='name'>{user.displayName ? user.displayName : "UnKnown"}</div>
                                     <div className='box'>{user.email}</div>
@@ -306,7 +329,15 @@ const Hero = ({ setSafeSearch, safeSearch }) => {
                         </div>}
                         {hemSlider.track === "user" && <div className="accaunt-logo">
                             <div className='account-img'>
-                                {user && <img src={user.photoURL ? JSON.parse(user.photoURL).userLink : "https://res.cloudinary.com/dgun0lg7q/image/upload/v1752855926/3_f3pgm3.jpg"} alt="pattern" />}
+                                {user && <img src={(() => {
+                                    try {
+                                        if (user?.photoURL) {
+                                            return JSON.parse(user?.photoURL)?.userLink
+                                        }
+                                    } catch (error) {
+                                        return "https://res.cloudinary.com/dgun0lg7q/image/upload/v1752855927/1_wjyymp.jpg"
+                                    }
+                                })()} alt="pattern" />}
                             </div>
                             {user && <div className='account-name'>{user.displayName ? user.displayName : "UnKnown"}</div>}
                         </div>}
@@ -409,8 +440,6 @@ const Hero = ({ setSafeSearch, safeSearch }) => {
 
             {(data && data.length > 0) && <div className="hero-footer-con">
                 <div className="left">Free image by <NavLink to={`${["film", "animation"].includes(data[99].type) ? "/videos" : "/" + data[99].type.split("/")[0] + "s"}/${data[99].tags.replaceAll(" ", "-").split(",").slice(0, 3).join("")}-${data[99].id}`} className={"div-span"}>{data[0].user}</NavLink></div>
-                {size > 500 && <div className="right">Read more about the <NavLink to={'/service/license-summary/'} className={"div-span"}>Content License</NavLink></div>
-                }
             </div>}
         </div>
 

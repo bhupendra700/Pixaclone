@@ -82,13 +82,13 @@
   width: 100%;
 }
 .hero-container header .search:hover {
-  background-color: rgb(233.25, 233.25, 233.25);
+  background-color: hsl(0, 0%, 101.4705882353%);
 }
 .hero-container header .search:hover .search-icon {
   color: rgba(0, 0, 0, 0.7843137255);
 }
 .hero-container header .search:hover input {
-  background-color: rgb(233.25, 233.25, 233.25);
+  background-color: hsl(0, 0%, 101.4705882353%);
 }
 .hero-container header .search:hover input::placeholder {
   color: black;
@@ -124,7 +124,7 @@
   font-size: 15px;
 }
 .hero-container header .search details:hover {
-  background-color: rgb(220.5, 220.5, 220.5);
+  background-color: hsl(0, 0%, 106.4705882353%);
 }
 .hero-container header .search details[open] summary i {
   transform: rotate(-180deg);
@@ -510,7 +510,7 @@
 .hero-container .hem-menu-container .login .hem-menu-header .accaunt-logo .account-img img {
   height: 100%;
   width: 100%;
-  object-fit: contain;
+  object-fit: cover !important;
 }
 .hero-container .hem-menu-container .login .hem-menu-header .accaunt-logo .account-name {
   background-color: #191b26;

@@ -71,13 +71,32 @@ const Page3 = () => {
     return () => unsubscribe
   }, [])
 
+  useEffect(() => {
+    if (user) {
+      if (authTrace !== "") {
+        setAuthTrace("")
+        document.body.removeAttribute("class")
+      }
+    }
+  }, [user])
+
+  useEffect(() => {
+    if (auth.currentUser) {
+      setUser(auth.currentUser)
+    }
+  }, [authTrace])
+
+  useEffect(() => {
+    document.title = `${(singleData && singleData.total > 0) ? `${singleData.hits[0].tags.split(",").slice(0, 3).map((word) => word.trim().charAt(0).toUpperCase() + word.trim().slice(1)).join(" ")} - Free ${cat.slice(0, 1).toUpperCase() + cat.slice(1)} on Pixaclone` : `Free ${cat.slice(0, 1).toUpperCase() + cat.slice(1)}`}`;
+  }, [loc.pathname, singleData])
+
   if (error) return <Error />
 
   if (!singleData) return <></>
 
   return <>
-    <Header safeSearch={safeSearch} setSafeSearch={setSafeSearch} authTrace={authTrace} setAuthTrace={setAuthTrace} user={user} setUser={setUser}/>
-    <Main singleData={singleData} safeSearch={safeSearch} setSafeSearch={setSafeSearch} authTrace={authTrace} setAuthTrace={setAuthTrace} user={user} setUser={setUser}/>
+    <Header safeSearch={safeSearch} setSafeSearch={setSafeSearch} authTrace={authTrace} setAuthTrace={setAuthTrace} user={user} setUser={setUser} />
+    <Main singleData={singleData} safeSearch={safeSearch} setSafeSearch={setSafeSearch} authTrace={authTrace} setAuthTrace={setAuthTrace} user={user} setUser={setUser} />
     <Footer />
   </>
 }

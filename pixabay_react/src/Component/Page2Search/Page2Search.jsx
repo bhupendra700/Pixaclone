@@ -1,11 +1,10 @@
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Header from './Header'
 import Main from './Main'
 import Footer from '../Page1/Footer'
-import { keepPreviousData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import { useLocation, useParams, useSearchParams } from 'react-router-dom'
-import { GlobalContext } from '../../App'
 import { useInView } from 'react-intersection-observer'
 
 const Page2Search = () => {
@@ -25,7 +24,7 @@ const Page2Search = () => {
 
     const [url, setUrl] = useState("");
 
-    const { cat ,text } = useParams();
+    const { cat, text } = useParams();
 
     const [searchParam, setSearchParam] = useSearchParams();
 
@@ -89,7 +88,11 @@ const Page2Search = () => {
         }
     }, [inView])
 
-    if (!data) return <></>
+    useEffect(() => {
+        document.title = `${(data && data.pages[0].total > 0) ? `${data.pages[0].total.toLocaleString("en-IN")} - Free ${cat.slice(0, 1).toUpperCase() + cat.slice(1)} on Pixaclone` : `Free ${cat.slice(0, 1).toUpperCase() + cat.slice(1)} on Pixaclone`}`;
+    }, [loc.pathname, data])
+
+    if (!error && !data) return <></>
 
     return <>
         <Header safeSearch={safeSearch} setSafeSearch={setSafeSearch} />

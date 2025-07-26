@@ -1,4 +1,4 @@
-import {useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import '../../CSS/Page2/main.css'
 import { CircularProgress } from '@mui/material'
@@ -32,8 +32,6 @@ const Main = ({ data, error, ref, isFetching }) => {
     black: "#000000",
     brown: "#ae5700"
   };
-
-  const [errorOccur, setErrorOccur] = useState(false);
 
   const { cat } = useParams();
 
@@ -225,12 +223,6 @@ const Main = ({ data, error, ref, isFetching }) => {
     setFilterCount(countFilter())
   }, [searchParam, loc.search, filterCount])
 
-  useEffect(() => {
-    if (error) {
-      setErrorOccur(true);
-    }
-  }, [error])
-
   const [count, setCount] = useState(window.innerWidth > 1280 ? 4 : window.innerWidth > 1024 ? 3 : window.innerWidth > 769 ? 2 : 1)
 
   useEffect(() => {
@@ -260,7 +252,7 @@ const Main = ({ data, error, ref, isFetching }) => {
     return () => window.removeEventListener("click", handleCatAnywhere);
   }, [size])
 
-  if (errorOccur) return <div className='main-div'>
+  if (error) return <div className='main-div'>
     <div className="upper">
       <div className="upper-wrapper">
         <div className={size < 1025 ? "filter1-mob" : "filter1-web"}>
@@ -282,7 +274,7 @@ const Main = ({ data, error, ref, isFetching }) => {
               </div>}
               <div className="body-filter">
                 <details className='catagory'>
-                  <summary>
+                  <summary id='catslider'>
                     {cat === "images" ? "All images" : cat.substring(0, 1).toUpperCase() + cat.substring(1)} <i className="ri-arrow-down-s-line"></i>
                   </summary>
                   <div>
@@ -313,7 +305,7 @@ const Main = ({ data, error, ref, isFetching }) => {
                     </span>
                     <span className={cat === "videos" ? 'cat-3 green' : "cat-3"} onClick={() => {
                       if (cat !== "videos") {
-                        categoryFilter("vectors")
+                        categoryFilter("videos")
                       }
                     }}>
                       <i className="ri-video-on-fill"></i> Videos
@@ -321,7 +313,7 @@ const Main = ({ data, error, ref, isFetching }) => {
                   </div>
                 </details>
                 <details className='orientation'>
-                  <summary>
+                  <summary id='orientationslider' >
                     {searchParam.has("orientation") ? searchParam.get("orientation").substring(0, 1).toUpperCase() + searchParam.get("orientation").substring(1) : "Orientation"}<i className="ri-arrow-down-s-line"></i>
                   </summary>
                   <div>
@@ -336,7 +328,7 @@ const Main = ({ data, error, ref, isFetching }) => {
                     </span>
                   </div>
                 </details>
-                <details className='size'>
+                <details className='size' id='sizeslider'>
                   <summary>
                     {searchParam.has("min_width") && searchParam.has("min_height") ? `> ${searchParam.get("min_width")} x ${searchParam.get("min_height")}` : searchParam.has("min_width") ? `> ${searchParam.get("min_width")} wide` : searchParam.has("min_height") ? `> ${searchParam.get("min_height")} high` : "Size"} <i className="ri-arrow-down-s-line"></i>
                   </summary>
@@ -354,8 +346,21 @@ const Main = ({ data, error, ref, isFetching }) => {
                         prevParam.delete("min_height");
                         setSearchParam(prevParam)
                         setSizeFilter({ width: 0, height: 0 })
+                        const slider = document.querySelector(".slider")
+                        slider.classList.add("go")
+                        slider.addEventListener('animationend', () => {
+                          slider.classList.remove("go")
+                          setFilter(!filter)
+                        }, { once: true })
                       }}><i className="ri-delete-bin-6-fill"></i> Clear</button>
-                      <button type='submit'>Apply</button>
+                      <button type='submit' onClick={() => {
+                        const slider = document.querySelector(".slider")
+                        slider.classList.add("go")
+                        slider.addEventListener('animationend', () => {
+                          slider.classList.remove("go")
+                          setFilter(!filter)
+                        }, { once: true })
+                      }}>Apply</button>
                     </div>
                   </form> : <div>
                     <section>Larger than</section>
@@ -371,13 +376,14 @@ const Main = ({ data, error, ref, isFetching }) => {
                         prevParam.delete("min_height");
                         setSearchParam(prevParam)
                         setSizeFilter({ width: 0, height: 0 })
+                        document.getElementById("sizeslider").removeAttribute("open")
                       }}><i className="ri-delete-bin-6-fill"></i> Clear</button>
-                      <button onClick={handleSubmiteSize}>Apply</button>
+                      <button onClick={(e) => { handleSubmiteSize(e); document.getElementById("sizeslider").removeAttribute("open") }}>Apply</button>
                     </section>
                   </div>
                   }
                 </details>
-                <details className='color'>
+                <details className='color' id='colorslider'>
                   <summary>
                     Color <i className="ri-arrow-down-s-line"></i>
                   </summary>
@@ -402,15 +408,47 @@ const Main = ({ data, error, ref, isFetching }) => {
                       )}
                     </section>
                     <section className='button-con'>
-                      <button onClick={() => applyColor("clear")}><i className="ri-delete-bin-6-fill"></i> Clear</button>
-                      <button onClick={() => applyColor("apply")}>Apply</button>
+                      <button onClick={() => {
+                        applyColor("clear");
+
+                        if (size > 1024) {
+                          document.getElementById("colorslider").removeAttribute("open")
+                        } else {
+                          const slider = document.querySelector(".slider")
+                          slider.classList.add("go")
+                          slider.addEventListener('animationend', () => {
+                            slider.classList.remove("go")
+                            setFilter(!filter)
+                          }, { once: true })
+                        }
+                      }}><i className="ri-delete-bin-6-fill"></i> Clear</button>
+                      <button onClick={() => {
+                        applyColor("apply")
+                        if (size > 1024) {
+                          document.getElementById("colorslider").removeAttribute("open")
+                        } else {
+                          const slider = document.querySelector(".slider")
+                          slider.classList.add("go")
+                          slider.addEventListener('animationend', () => {
+                            slider.classList.remove("go")
+                            setFilter(!filter)
+                          }, { once: true })
+                        }
+                        ;
+                      }}>Apply</button>
                     </section>
                   </div>
                 </details>
                 {(searchParam.has("orientation") || searchParam.has("min_width") || searchParam.has("min_height") || searchParam.has("colors")) && <button className='globalClear' onClick={() => {
                   const para = new URLSearchParams();
                   searchParam.has("order") ? para.set("order", searchParam.get("order")) : null;
-                  setSearchParam(para)
+                  setSearchParam(para);
+                  const slider = document.querySelector(".slider")
+                  slider.classList.add("go")
+                  slider.addEventListener('animationend', () => {
+                    slider.classList.remove("go")
+                    setFilter(!filter)
+                  }, { once: true })
                 }}><i className="ri-delete-bin-6-fill"></i> Clear all</button>}
               </div>
             </div>
@@ -418,14 +456,14 @@ const Main = ({ data, error, ref, isFetching }) => {
         </div>
         <div className={size < 1025 ? "filter2-mob" : "filter2-web"}>
           <details>
-            <summary>
-              {searchParam.get("order") === "latest" ? "Latest" : searchParam.get("order") === "popular" ? "Popular" : "Editor's Choice"} <i className="ri-arrow-down-s-line"></i>
+            <summary id='orderslider'>
+              {searchParam.get("order") === "ec" ? "Editor's Choice" : searchParam.get("order") === "popular" ? "Popular" : "Latest"} <i className="ri-arrow-down-s-line"></i>
             </summary>
             <div>
-              <span className={(searchParam.get("order") !== "latest" && searchParam.get("order") !== "popular") ? 'cat-3 green' : 'cat-3'} onClick={() => orderFilter("ec")}>
+              <span className={searchParam.get("order") === "ec" ? 'cat-3 green' : 'cat-3'} onClick={() => orderFilter("ec")}>
                 Editor's Choice
               </span>
-              <span className={searchParam.get("order") === "latest" ? 'cat-1 green' : 'cat-1'} onClick={() => {
+              <span className={((searchParam.get("order") !== "ec" && searchParam.get("order") !== "popular")) ? 'cat-1 green' : 'cat-1'} onClick={() => {
                 orderFilter("latest")
               }}>
                 Latest
@@ -470,7 +508,7 @@ const Main = ({ data, error, ref, isFetching }) => {
               </div>}
               <div className="body-filter">
                 <details className='catagory'>
-                  <summary>
+                  <summary id='catslider'>
                     {cat === "images" ? "All images" : cat.substring(0, 1).toUpperCase() + cat.substring(1)} <i className="ri-arrow-down-s-line"></i>
                   </summary>
                   <div>
@@ -501,7 +539,7 @@ const Main = ({ data, error, ref, isFetching }) => {
                     </span>
                     <span className={cat === "videos" ? 'cat-3 green' : "cat-3"} onClick={() => {
                       if (cat !== "videos") {
-                        categoryFilter("vectors")
+                        categoryFilter("videos")
                       }
                     }}>
                       <i className="ri-video-on-fill"></i> Videos
@@ -509,7 +547,7 @@ const Main = ({ data, error, ref, isFetching }) => {
                   </div>
                 </details>
                 <details className='orientation'>
-                  <summary>
+                  <summary id='orientationslider' >
                     {searchParam.has("orientation") ? searchParam.get("orientation").substring(0, 1).toUpperCase() + searchParam.get("orientation").substring(1) : "Orientation"}<i className="ri-arrow-down-s-line"></i>
                   </summary>
                   <div>
@@ -524,7 +562,7 @@ const Main = ({ data, error, ref, isFetching }) => {
                     </span>
                   </div>
                 </details>
-                <details className='size'>
+                <details className='size' id='sizeslider'>
                   <summary>
                     {searchParam.has("min_width") && searchParam.has("min_height") ? `> ${searchParam.get("min_width")} x ${searchParam.get("min_height")}` : searchParam.has("min_width") ? `> ${searchParam.get("min_width")} wide` : searchParam.has("min_height") ? `> ${searchParam.get("min_height")} high` : "Size"} <i className="ri-arrow-down-s-line"></i>
                   </summary>
@@ -542,8 +580,21 @@ const Main = ({ data, error, ref, isFetching }) => {
                         prevParam.delete("min_height");
                         setSearchParam(prevParam)
                         setSizeFilter({ width: 0, height: 0 })
+                        const slider = document.querySelector(".slider")
+                        slider.classList.add("go")
+                        slider.addEventListener('animationend', () => {
+                          slider.classList.remove("go")
+                          setFilter(!filter)
+                        }, { once: true })
                       }}><i className="ri-delete-bin-6-fill"></i> Clear</button>
-                      <button type='submit'>Apply</button>
+                      <button type='submit' onClick={() => {
+                        const slider = document.querySelector(".slider")
+                        slider.classList.add("go")
+                        slider.addEventListener('animationend', () => {
+                          slider.classList.remove("go")
+                          setFilter(!filter)
+                        }, { once: true })
+                      }}>Apply</button>
                     </div>
                   </form> : <div>
                     <section>Larger than</section>
@@ -559,13 +610,14 @@ const Main = ({ data, error, ref, isFetching }) => {
                         prevParam.delete("min_height");
                         setSearchParam(prevParam)
                         setSizeFilter({ width: 0, height: 0 })
+                        document.getElementById("sizeslider").removeAttribute("open")
                       }}><i className="ri-delete-bin-6-fill"></i> Clear</button>
-                      <button onClick={handleSubmiteSize}>Apply</button>
+                      <button onClick={(e) => { handleSubmiteSize(e); document.getElementById("sizeslider").removeAttribute("open") }}>Apply</button>
                     </section>
                   </div>
                   }
                 </details>
-                <details className='color'>
+                <details className='color' id='colorslider'>
                   <summary>
                     Color <i className="ri-arrow-down-s-line"></i>
                   </summary>
@@ -590,15 +642,47 @@ const Main = ({ data, error, ref, isFetching }) => {
                       )}
                     </section>
                     <section className='button-con'>
-                      <button onClick={() => applyColor("clear")}><i className="ri-delete-bin-6-fill"></i> Clear</button>
-                      <button onClick={() => applyColor("apply")}>Apply</button>
+                      <button onClick={() => {
+                        applyColor("clear");
+
+                        if (size > 1024) {
+                          document.getElementById("colorslider").removeAttribute("open")
+                        } else {
+                          const slider = document.querySelector(".slider")
+                          slider.classList.add("go")
+                          slider.addEventListener('animationend', () => {
+                            slider.classList.remove("go")
+                            setFilter(!filter)
+                          }, { once: true })
+                        }
+                      }}><i className="ri-delete-bin-6-fill"></i> Clear</button>
+                      <button onClick={() => {
+                        applyColor("apply")
+                        if (size > 1024) {
+                          document.getElementById("colorslider").removeAttribute("open")
+                        } else {
+                          const slider = document.querySelector(".slider")
+                          slider.classList.add("go")
+                          slider.addEventListener('animationend', () => {
+                            slider.classList.remove("go")
+                            setFilter(!filter)
+                          }, { once: true })
+                        }
+                        ;
+                      }}>Apply</button>
                     </section>
                   </div>
                 </details>
                 {(searchParam.has("orientation") || searchParam.has("min_width") || searchParam.has("min_height") || searchParam.has("colors")) && <button className='globalClear' onClick={() => {
                   const para = new URLSearchParams();
                   searchParam.has("order") ? para.set("order", searchParam.get("order")) : null;
-                  setSearchParam(para)
+                  setSearchParam(para);
+                  const slider = document.querySelector(".slider")
+                  slider.classList.add("go")
+                  slider.addEventListener('animationend', () => {
+                    slider.classList.remove("go")
+                    setFilter(!filter)
+                  }, { once: true })
                 }}><i className="ri-delete-bin-6-fill"></i> Clear all</button>}
               </div>
             </div>
@@ -606,14 +690,14 @@ const Main = ({ data, error, ref, isFetching }) => {
         </div>
         <div className={size < 1025 ? "filter2-mob" : "filter2-web"}>
           <details>
-            <summary>
-              {searchParam.get("order") === "latest" ? "Latest" : searchParam.get("order") === "popular" ? "Popular" : "Editor's Choice"} <i className="ri-arrow-down-s-line"></i>
+            <summary id='orderslider'>
+              {searchParam.get("order") === "ec" ? "Editor's Choice" : searchParam.get("order") === "popular" ? "Popular" : "Latest"} <i className="ri-arrow-down-s-line"></i>
             </summary>
             <div>
-              <span className={(searchParam.get("order") !== "latest" && searchParam.get("order") !== "popular") ? 'cat-3 green' : 'cat-3'} onClick={() => orderFilter("ec")}>
+              <span className={searchParam.get("order") === "ec" ? 'cat-3 green' : 'cat-3'} onClick={() => orderFilter("ec")}>
                 Editor's Choice
               </span>
-              <span className={searchParam.get("order") === "latest" ? 'cat-1 green' : 'cat-1'} onClick={() => {
+              <span className={((searchParam.get("order") !== "ec" && searchParam.get("order") !== "popular")) ? 'cat-1 green' : 'cat-1'} onClick={() => {
                 orderFilter("latest")
               }}>
                 Latest

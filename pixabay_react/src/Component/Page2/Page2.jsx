@@ -9,6 +9,7 @@ import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
 import { useInView } from 'react-intersection-observer'
 
 const Page2 = () => {
+    const loc = useLocation();
 
     const [safeSearch, setSafeSearch] = useState(localStorage.getItem('safeSearch') ? localStorage.getItem('safeSearch') === 'true' ? true : false : "");
 
@@ -28,8 +29,6 @@ const Page2 = () => {
     const { cat } = useParams();
 
     const [searchParam, setSearchParam] = useSearchParams();
-
-    const loc = useLocation();
 
     useEffect(() => {
         let safeSearchQuery = safeSearch === "" ? true : safeSearch;
@@ -89,7 +88,11 @@ const Page2 = () => {
         }
     }, [inView])
 
-    if (!data) return <></>
+    useEffect(() => {
+        document.title = `${(data && data.pages[0].total > 0) ? `${data.pages[0].total.toLocaleString("en-IN")} - Free ${cat.slice(0,1).toUpperCase()+cat.slice(1)} on Pixaclone` : `Free ${cat.slice(0,1).toUpperCase()+cat.slice(1)} on Pixaclone`}`;
+    }, [loc.pathname ,data])
+
+    if (!error && !data) return <></>
 
     return <>
         <Header safeSearch={safeSearch} setSafeSearch={setSafeSearch} />

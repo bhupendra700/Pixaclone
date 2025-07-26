@@ -118,6 +118,7 @@ const ProfilePage = ({ profile, setProfile, user, setUser, setShowDelete }) => {
 
             setUser({ ...auth.currentUser });
 
+            document.body.removeAttribute("class")
             notify("Your profile updated successfully", "success")
             setProfile(false)
             setUploading(false)

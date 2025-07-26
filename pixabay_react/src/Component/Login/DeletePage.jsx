@@ -1,11 +1,15 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { auth } from '../Firebase';
 import { deleteUser, EmailAuthProvider, GoogleAuthProvider, reauthenticateWithCredential, reauthenticateWithPopup } from 'firebase/auth';
 import axios from 'axios';
 import { CircularProgress } from '@mui/material';
 import "../../CSS/Login/deletePage.css"
+import { GlobalContext } from '../../App';
 
-const DeletePage = ({setShowDelete , user}) => {
+
+const DeletePage = ({ setShowDelete, user }) => {
+
+    const { notify } = useContext(GlobalContext)
     const [deleting, setDeleting] = useState(false)
     const [password, setPassword] = useState("")
 
@@ -32,6 +36,7 @@ const DeletePage = ({setShowDelete , user}) => {
             }
 
 
+            document.body.removeAttribute("class");
             setShowDelete(false)
             setDeleting(false)
         } catch (error) {
@@ -44,7 +49,7 @@ const DeletePage = ({setShowDelete , user}) => {
         <div className="delete-account">
             <div className="delete-header">
                 <h3>Delete account</h3>
-                <i onClick={() => { if (!deleting){ setShowDelete(false) } }} className="ri-close-fill"></i>
+                <i onClick={() => { if (!deleting) { setShowDelete(false) } }} className="ri-close-fill"></i>
             </div>
             <div className="delete-message">
                 <p><i className="ri-information-2-fill"></i> Are you sure?</p>

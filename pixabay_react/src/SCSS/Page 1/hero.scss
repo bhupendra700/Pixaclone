@@ -1,4 +1,5 @@
 $paddinglr: 20px; //padding left right
+@use 'sass:color';
 
 .hero-container {
     height: 500px;
@@ -92,14 +93,14 @@ $paddinglr: 20px; //padding left right
             width: 100%;
 
             &:hover {
-                background-color: darken(#f6f6f6, 5%);
+                background-color: color.adjust(#f6f6f6,$lightness : 5%);
 
                 .search-icon {
                     color: #000000c8;
                 }
 
                 input {
-                    background-color: darken(#f6f6f6, 5%);
+                    background-color: color.adjust(#f6f6f6, $lightness : 5%);
 
                     // background-color: aqua;
                     &::placeholder {
@@ -145,7 +146,7 @@ $paddinglr: 20px; //padding left right
                 font-size: 15px;
 
                 &:hover {
-                    background-color: darken(#f6f6f6, 10%);
+                    background-color: color.adjust(#f6f6f6, $lightness : 10%);
                 }
 
                 &[open] {
@@ -626,7 +627,7 @@ $paddinglr: 20px; //padding left right
                     align-items: center;
                     gap: 10px;
 
-                    .account-img {
+                    .account-img{
                         background-color: red;
                         display: flex;
                         border-radius: 50%;
@@ -637,7 +638,7 @@ $paddinglr: 20px; //padding left right
                         img {
                             height: 100%;
                             width: 100%;
-                            object-fit: contain;
+                            object-fit: cover !important;
                         }
                     }
 

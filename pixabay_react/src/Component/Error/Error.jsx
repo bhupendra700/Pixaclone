@@ -155,6 +155,21 @@ const Error = () => {
 
     const [authTrace, setAuthTrace] = useState("");
 
+    useEffect(() => {
+        if (user) {
+            if (authTrace !== "") {
+                setAuthTrace("")
+                document.body.removeAttribute("class")
+            }
+        }
+    }, [user])
+
+    useEffect(() => {
+        if (auth.currentUser) {
+            setUser(auth.currentUser)
+        }
+    }, [authTrace])
+
     const [profile, setProfile] = useState(false);
 
     const [showDelete, setShowDelete] = useState(false)
@@ -176,7 +191,15 @@ const Error = () => {
                     {
                         user ? <>
                             <details className='user' id='det2' open={hemSlider.track === "user" ? hemSlider.open : false}>
-                                <summary onClick={(e) => { e.preventDefault(); setHemSlider({ ...hemSlider, track: "user", open: hemSlider.track === "user" ? !hemSlider.open : true }) }}><img src={user?.photoURL ? JSON.parse(user.photoURL)?.userLink : "https://res.cloudinary.com/dgun0lg7q/image/upload/v1752855927/1_wjyymp.jpg"} /></summary>
+                                <summary onClick={(e) => { e.preventDefault(); setHemSlider({ ...hemSlider, track: "user", open: hemSlider.track === "user" ? !hemSlider.open : true }) }}><img src={(() => {
+                                    try {
+                                        if (user?.photoURL) {
+                                            return JSON.parse(user?.photoURL)?.userLink
+                                        }
+                                    } catch (error) {
+                                        return "https://res.cloudinary.com/dgun0lg7q/image/upload/v1752855927/1_wjyymp.jpg"
+                                    }
+                                })()} /></summary>
                                 {size > 750 && <div className='profile'>
                                     <div className='name'>{user.displayName ? user.displayName : "UnKnown"}</div>
                                     <div className='box'>{user.email}</div>
@@ -240,7 +263,15 @@ const Error = () => {
                         </div>}
                         {hemSlider.track === "user" && <div className="accaunt-logo">
                             <div className='account-img'>
-                                {user && <img src={user.photoURL ? JSON.parse(user.photoURL).userLink : "https://res.cloudinary.com/dgun0lg7q/image/upload/v1752855926/3_f3pgm3.jpg"} alt="pattern" />}
+                                {user && <img src={(() => {
+                                    try {
+                                        if (user?.photoURL) {
+                                            return JSON.parse(user?.photoURL)?.userLink
+                                        }
+                                    } catch (error) {
+                                        return "https://res.cloudinary.com/dgun0lg7q/image/upload/v1752855927/1_wjyymp.jpg"
+                                    }
+                                })()} alt="pattern" />}
                             </div>
                             {user && <div className='account-name'>{user.displayName ? user.displayName : "UnKnown"}</div>}
                         </div>}

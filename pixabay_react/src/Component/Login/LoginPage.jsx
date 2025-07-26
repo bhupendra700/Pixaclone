@@ -8,7 +8,7 @@ import google from '../../Images/google-logo.png'
 import '../../CSS/Login/loginpage.css'
 import { auth } from '../Firebase';
 
-const LoginPage = ({authTrace , setAuthTrace , setIsForgot}) => {
+const LoginPage = ({ authTrace, setAuthTrace, setIsForgot }) => {
 
     const { notify } = useContext(GlobalContext);
 
@@ -20,12 +20,14 @@ const LoginPage = ({authTrace , setAuthTrace , setIsForgot}) => {
             setSocialLoader(true)
             const googleProvider = new GoogleAuthProvider()
             await signInWithPopup(auth, googleProvider);
-            await updateProfile(auth.currentUser , {
-                photoURL : JSON.stringify({
-                    userLink : "https://res.cloudinary.com/dgun0lg7q/image/upload/v1752855927/1_wjyymp.jpg" , 
-                    public_id : "",
+            if (auth.currentUser.photoURL.startsWith("https://")) {
+                await updateProfile(auth.currentUser, {
+                    photoURL: JSON.stringify({
+                        userLink: "https://res.cloudinary.com/dgun0lg7q/image/upload/v1752855927/1_wjyymp.jpg",
+                        public_id: "",
+                    })
                 })
-            })
+            }
             setSocialLoader(false)
             setAuthTrace("")
             document.body.removeAttribute("class")
