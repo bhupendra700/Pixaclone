@@ -8,16 +8,16 @@ const Footer = () => {
             <Link className='link' to={'/'}>Pixaclone</Link>
         </h2>
         <div className="social">
-            <NavLink className={"icon insta"} to={'/facebook.com'} target='_blank'>
+            <NavLink className={"icon insta"} to={'https://www.instagram.com/pixabay/'} target='_blank'>
                 <i className="ri-instagram-fill"></i>
             </NavLink>
-            <NavLink className={"icon pinterest"} to={'/facebook.com'} target='_blank'>
+            <NavLink className={"icon pinterest"} to={'https://www.pinterest.com/pixabay/'} target='_blank'>
                 <i className="ri-pinterest-fill"></i>
             </NavLink>
-            <NavLink className={"icon twitter"} to={'/facebook.com'} target='_blank'>
+            <NavLink className={"icon twitter"} to={'https://x.com/pixabay'} target='_blank'>
                 <i className="ri-twitter-x-fill"></i>
             </NavLink>
-            <NavLink className={"icon fb"} to={'/facebook.com'} target='_blank'>
+            <NavLink className={"icon fb"} to={'https://www.facebook.com/pixabay'} target='_blank'>
                 <i className="ri-facebook-fill"></i>
             </NavLink>
         </div>
