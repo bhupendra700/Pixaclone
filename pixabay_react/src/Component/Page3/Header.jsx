@@ -1,0 +1,286 @@
+import { useEffect, useState } from 'react'
+import { NavLink, Link, useNavigate, useParams } from 'react-router-dom';
+import useWindowSize from '../useWindowSize';
+import { auth } from '../Firebase';
+import { signOut } from 'firebase/auth';
+import LoginPage from '../../Component/Login/LoginPage'
+import ProfilePage from '../Login/ProfilePage';
+import DeletePage from '../Login/DeletePage';
+import ForgotPage from '../Login/ForgotPage';
+import '../../CSS/Page3/header.css'
+
+
+const Header = ({ safeSearch, setSafeSearch, authTrace, setAuthTrace, user, setUser }) => {
+
+    const size = useWindowSize()
+
+    const navigate = useNavigate();
+    const { cat } = useParams();
+
+    const [topCat, setTopCat] = useState(cat);
+
+    useEffect(() => {
+        setTopCat(cat);
+    }, [cat])
+
+    const [hemSlider, setHemSlider] = useState({ track: "unknown", open: false });
+
+    useEffect(() => {
+        if (size <= 750 && hemSlider.track !== "unknown" && hemSlider.open) {
+            document.body.setAttribute("class", "hidescroll");
+        } else if (authTrace !== "") {
+            document.body.setAttribute("class", "hidescroll");
+        } else if(isForgot){
+            document.body.setAttribute("class", "hidescroll");
+        }else if(profile){
+            document.body.setAttribute("class", "hidescroll");
+        }else if(showDelete){
+            document.body.setAttribute("class", "hidescroll");
+        }else {
+            document.body.removeAttribute("class")
+        }
+    }, [size, hemSlider]);
+
+    const handleAnyWhere = (e) => {
+        const topCatDet = document.getElementById("det1");
+        if (topCatDet && !topCatDet.contains(e.target)) {
+            topCatDet.parentElement.removeAttribute("open");
+        }
+
+        const user = document.getElementById("det2");
+        const hem = document.getElementsByClassName("user-hameburgur")[0];
+
+        if (!hem && user && !user.contains(e.target)) {
+            setHemSlider({ ...hemSlider, open: false })
+        }
+    }
+
+    useEffect(() => {
+        document.addEventListener("click", handleAnyWhere);
+
+        return () => document.removeEventListener("click", handleAnyWhere);
+    }, [])
+
+    const [search, setSearch] = useState("")
+
+    const handleAnimation = () => {
+        const go = document.getElementsByClassName("hem-menu-container")[0];
+        go.addEventListener("animationend", () => {
+            go.classList.remove("go");
+            setHemSlider({ ...hemSlider, open: !hemSlider.open })
+        }, { once: true });
+    }
+
+    const [profile, setProfile] = useState(false);
+
+    const [showDelete, setShowDelete] = useState(false)
+
+    const [isForgot, setIsForgot] = useState(false)
+
+    return <>
+        <div className='main-container-x'>
+            <header>
+                <NavLink to={'/'} className="logo">
+                    {size <= 750 ? <div className="short">
+                        pc
+                    </div> :
+                        <div className="long">
+                            Pixaclone
+                        </div>}
+                </NavLink>
+                {size > 330 && <div className="search">
+                    <i className="search-icon ri-search-line" onClick={() => {
+                        if (search !== "") {
+                            navigate(`/${topCat}/search/${search.trim()}`)
+                        }
+                    }}></i>
+                    <input type="search" placeholder='Search Pixabay' value={search} onChange={(e) => { setSearch(e.target.value) }} onKeyDown={(e) => {
+                        if (e.key === "Enter" && search !== "") {
+                            navigate(`/${topCat}/search/${search.trim()}`)
+                        }
+                    }} />
+                    {size > 750 && <details>
+                        <summary id='det1'>
+                            {topCat === "images" ? "All images" : topCat.substring(0, 1).toUpperCase() + topCat.substring(1)} <i className="ri-arrow-down-s-line"></i>
+                        </summary>
+                        <div>
+                            <span className={topCat === "images" ? 'cat-1 green' : 'cat-1'} onClick={() => {
+                                setTopCat("images");
+                            }}>
+                                <i className="ri-image-fill"></i> All images
+                            </span>
+                            <span className='cat-2'>
+                                <p className={topCat === "photos" ? 'green' : ""} onClick={() => {
+                                    setTopCat("photos");
+                                }}><i className="ri-camera-fill"></i> Photos</p>
+                                <p className={topCat === "illustrations" ? 'green' : ""} onClick={() => {
+                                    setTopCat("illustrations");
+                                }}><i className="ri-ball-pen-fill"></i> Illustrations</p>
+                                <p className={topCat === "vectors" ? 'green' : ""} onClick={() => {
+                                    setTopCat("vectors");
+                                }}><i className="ri-pen-nib-fill"></i> Vectors</p>
+                            </span>
+                            <span className={topCat === "videos" ? 'cat-3 green' : 'cat-3'} onClick={() => {
+                                setTopCat("videos");
+                            }}>
+                                <i className="ri-video-on-fill"></i> Videos
+                            </span>
+                        </div>
+                    </details>}
+                </div>}
+                {/* Account */}
+                {
+                    user ?
+                        <>
+                            <details className='user' id='det2' open={hemSlider.track === "user" ? hemSlider.open : false}>
+                                <summary onClick={(e) => { e.preventDefault(); setHemSlider({ ...hemSlider, track: "user", open: hemSlider.track === "user" ? !hemSlider.open : true }) }}><img src={user?.photoURL ? JSON.parse(user.photoURL)?.userLink : "https://res.cloudinary.com/dgun0lg7q/image/upload/v1752855927/1_wjyymp.jpg"} /></summary>
+                                {size > 750 && <div className='profile'>
+                                    <div className='name'>{user.displayName ? user.displayName : "UnKnown"}</div>
+                                    <div className='box'>{user.email}</div>
+                                    <div onClick={() => { setProfile(!profile); setHemSlider({ ...hemSlider, track: "user", open: hemSlider.track === "user" ? !hemSlider.open : true }) }} className='box'>Edit Profile</div>
+                                    <div className='safesearch'>
+                                        <label htmlFor="switchbtn" className='switchlabel'>
+                                            <div className='safeSearch-container'>
+                                                <div className={safeSearch ? "switchon switch" : "switch"}>
+                                                    <input
+                                                        checked={safeSearch}
+                                                        onChange={() => { setSafeSearch(!safeSearch) }}
+                                                        id="switchbtn" type="checkbox" />
+                                                </div>
+                                                SafeSearch
+                                            </div>
+                                            <div className='safesearch-info'>
+                                                <i onClick={(e) => { e.stopPropagation() }} className="ri-question-line" ></i>
+                                                <span className='safesearchmessage'>If you’re using Pixabay in a school or workplace, you can prevent most adult content from showing up by turning on the SafeSearch setting.
+                                                </span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <button onClick={async () => { await signOut(auth); setHemSlider({ ...hemSlider, track: "user", open: hemSlider.track === "user" ? !hemSlider.open : true }) }}>Logout</button>
+                                </div>}
+                            </details>
+                            {size > 750 && <button className='logout' onClick={async () => { await signOut(auth) }}>Logout</button>}
+                        </>
+                        : <>
+                            {size > 750 && <div className="login" onClick={() => {
+                                document.body.setAttribute("class", "hidescroll");
+                                setAuthTrace("login");
+                            }}>
+                                <button>
+                                    Log in
+                                </button>
+                            </div>}
+                            <div className="join" onClick={() => {
+                                document.body.setAttribute("class", "hidescroll");
+                                setAuthTrace("signup")
+                            }}
+                            >
+                                <button>
+                                    Join
+                                </button>
+                            </div>
+                        </>
+                }
+
+                {/* user ka hameburgur icon */}
+                {size <= 750 && <div className="user-hameburgur" onClick={() => { setHemSlider({ ...hemSlider, track: "hem", open: hemSlider.track === "hem" ? !hemSlider.open : true }) }}>
+                    <i className="ri-menu-fill"></i>
+                </div>}
+            </header>
+
+            {(hemSlider.track !== "unknown" && hemSlider.track === "user" ? size <= 750 ? hemSlider.open : false : hemSlider.open) && <div className="hem-menu-container">
+                <div className={hemSlider.track === "user" ? "hem-menu login" : hemSlider.track === "hem" ? "hem-menu hem" : "hem-menu"}>
+                    <div className="hem-menu-header">
+                        {hemSlider.track === "hem" && <div className="logo">
+                            pc
+                        </div>}
+                        {hemSlider.track === "user" && <div className="accaunt-logo">
+                            <div className='account-img'>
+                                {user && <img src={user.photoURL ? JSON.parse(user.photoURL).userLink : "https://res.cloudinary.com/dgun0lg7q/image/upload/v1752855926/3_f3pgm3.jpg"} alt="pattern" />}
+                            </div>
+                            {user && <div className='account-name'>{user.displayName ? user.displayName : "UnKnown"}</div>}
+                        </div>}
+                        <i className="ri-close-fill" onClick={() => {
+                            document.getElementsByClassName("hem-menu-container")[0].classList.add("go");
+                            handleAnimation();
+                        }}
+                        ></i>
+                    </div>
+                    <div className="hem-menu-slider">
+                        {hemSlider.track === "user" ? <div className="hem-menu-main-user">
+                            {user && <div className="hem-menu-email">{user.email}</div>}
+                            <div className="hem-menu-main-editprofile" onClick={() => {
+                                setProfile(true)
+                                document.getElementsByClassName("hem-menu-container")[0].classList.add("go");
+                                handleAnimation();
+                            }}>Edit Profile</div>
+                            <div className="hem-menu-safeSearch">
+                                <label className="hi" htmlFor="hem-menu-checkbox">
+                                    <input checked={safeSearch}
+                                        onChange={() => { setSafeSearch(!safeSearch) }} type="checkbox" id='hem-menu-checkbox' />
+                                    <div className="safeSearch-con">
+                                        <div className="text">SafeSearch</div>
+                                        <div className="switch-con">
+                                            <div></div>
+                                        </div>
+                                    </div>
+                                    <div className="safeSearch-message">
+                                        If you’re using Pixabay in a school or workplace, you can prevent most adult content from showing up by turning on the SafeSearch setting.
+                                    </div>
+                                </label>
+                            </div>
+                            <button onClick={async () => {
+                                await signOut(auth); document.getElementsByClassName("hem-menu-container")[0].classList.add("go");
+                                handleAnimation();
+                            }}>Logout</button>
+                        </div> :
+                            <div className="hem-menu-main-hem">
+                                <div className="media">Media</div>
+                                <div className={topCat === "images" ? "allimages green" : "allimages"} onClick={() => {
+                                    setTopCat("images")
+                                    document.getElementsByClassName("hem-menu-container")[0].classList.add("go");
+                                    handleAnimation();
+                                }}><i className="ri-image-fill"></i> All Images</div>
+                                <div className={topCat === "photos" ? "photos green" : "photos"} onClick={() => {
+                                    setTopCat("photos")
+                                    document.getElementsByClassName("hem-menu-container")[0].classList.add("go");
+                                    handleAnimation();
+                                }}><i className="ri-camera-fill"></i> Photos</div>
+                                <div className={topCat === "illustrations" ? "illustrations green" : "illustrations"} onClick={() => {
+                                    setTopCat("illustrations")
+                                    document.getElementsByClassName("hem-menu-container")[0].classList.add("go");
+                                    handleAnimation();
+                                }}><i className="ri-ball-pen-fill"></i> Illustrations</div>
+                                <div className={topCat === "vectors" ? "vectors green" : "vectors"} onClick={() => {
+                                    setTopCat("vectors")
+                                    document.getElementsByClassName("hem-menu-container")[0].classList.add("go");
+                                    handleAnimation();
+                                }}><i className="ri-pen-nib-fill"></i> Vectors</div>
+                                <div className={topCat === "videos" ? "videos green" : "videos"} onClick={() => {
+                                    setTopCat("videos")
+                                    document.getElementsByClassName("hem-menu-container")[0].classList.add("go");
+                                    handleAnimation();
+                                }}><i className="ri-video-on-fill"></i> Videos</div>
+                            </div>}
+                        <div className="hem-menu-footer">
+                            <Link to='google.com' target='_blank' className="insta"><i className="ri-instagram-fill"></i></Link>
+                            <Link to='google.com' target='_blank' className="pinterest"><i className="ri-pinterest-fill"></i></Link>
+                            <Link to='google.com' target='_blank' className="twitter"><i className="ri-twitter-x-line"></i></Link>
+                            <Link to='google.com' target='_blank' className="fb"><i className="ri-facebook-circle-fill"></i></Link>
+                        </div>
+                    </div>
+                </div>
+            </div>}
+        </div>
+
+        {(!user && authTrace) && <LoginPage authTrace={authTrace} setAuthTrace={setAuthTrace} setIsForgot={setIsForgot} />}
+
+        {profile && <ProfilePage profile={profile} setProfile={setProfile} user={user} setUser={setUser} setShowDelete={setShowDelete} />}
+
+        {showDelete && <DeletePage setShowDelete={setShowDelete} user={user} />}
+
+        {isForgot && <ForgotPage setIsForgot={setIsForgot} />}
+    </>
+}
+
+export default Header
