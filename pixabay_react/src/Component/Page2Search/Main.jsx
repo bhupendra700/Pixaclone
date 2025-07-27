@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import '../../CSS/Page2/main.css'
-import { CircularProgress } from '@mui/material'
+import { capitalize, CircularProgress } from '@mui/material'
 import useWindowSize from '../useWindowSize'
 
 const Main = ({ data, error, ref, isFetching }) => {
@@ -33,7 +33,7 @@ const Main = ({ data, error, ref, isFetching }) => {
     brown: "#ae5700"
   };
 
-  const { cat } = useParams();
+  const { cat, text } = useParams();
 
   const loc = useLocation();
 
@@ -41,41 +41,58 @@ const Main = ({ data, error, ref, isFetching }) => {
 
   const [searchParam, setSearchParam] = useSearchParams();
 
-  const [sizeFilter, setSizeFilter] = useState({ width: searchParam.has("min_width") ? parseInt(searchParam.get("min_width")) : 0, height: searchParam.has("min_height") ? parseInt(searchParam.get("min_height")) : 0 });
+  const [sizeFilter, setSizeFilter] = useState({ width: (searchParam.has("min_width") && !isNaN(searchParam.get("min_width"))) ? parseInt(searchParam.get("min_width")) : 0, height: (searchParam.has("min_height") && !isNaN(searchParam.get("min_height"))) ? parseInt(searchParam.get("min_height")) : 0 });
 
-  useEffect(() => {
-    setSizeFilter({ width: searchParam.has("min_width") ? parseInt(searchParam.get("min_width")) : 0, height: searchParam.has("min_height") ? parseInt(searchParam.get("min_height")) : 0 })
-  }, [loc, searchParam])
+ useEffect(() => {
+    setSizeFilter({ width: (searchParam.has("min_width") && !isNaN(searchParam.get("min_width"))) ? parseInt(searchParam.get("min_width")) : 0, height: (searchParam.has("min_height") && !isNaN(searchParam.get("min_height"))) ? parseInt(searchParam.get("min_height")) : 0 })
+  }, [loc.pathname , searchParam])
 
   const handleSize = (e) => {
     setSizeFilter({ ...sizeFilter, [e.target.name]: e.target.value });
   }
 
-  const handleSubmiteSize = (e) => {
+   const handleSubmiteSize = (e) => {
     e.preventDefault()
-    let para = new URLSearchParams();
 
-    searchParam.has("order") ? para.set("order", searchParam.get("order")) : null;
+    let query = "";
 
-    searchParam.has("orientation") ? para.set("orientation", searchParam.get("orientation")) : null;
+    if (searchParam.has("order") && ["ec", "latest", "popular"].includes(searchParam.get("order"))) {
+      query += `order=${searchParam.get("order")}&`
+    }
+
+    if (["horizontal", "vertical"].includes(searchParam.get("orientation"))) {
+      query += `orientation=${searchParam.get("orientation")}&`
+    }
 
     if (sizeFilter.width > 0) {
-      para.set("min_width", sizeFilter.width);
+      query += `min_width=${sizeFilter.width}&`
     }
     if (sizeFilter.height > 0) {
-      para.set("min_height", sizeFilter.height);
+      query += `min_height=${sizeFilter.height}&`;
     }
 
-    for (let i = 0; i < colorFilter.length; i++) {
-      para.append("colors", colorFilter[i]);
+    if (searchParam.has("colors")) {
+      const newvalidColor = ["grayscale", "transparent", "red", "orange", "yellow", "green", "turquoise", "blue", "lilac", "pink", "white", "gray", "black", "brown"];
+
+      const newcolorArray = Array.from(new Set(searchParam.getAll("colors")));
+
+      let newallValidColor = newcolorArray.filter((colorele) => {
+        return newvalidColor.includes(colorele);
+      })
+
+      for (let i = 0; i < newallValidColor.length; i++) {
+        query += `colors=${newallValidColor[i]}&`;
+      }
     }
 
-    setSearchParam(para);
+    query = query.slice(0, -1);
+
+    setSearchParam(query);
   }
 
   const validColorParam = () => {
     const allValidcolor = ["grayscale", "transparent", "red", "orange", "yellow", "green", "turquoise", "blue", "lilac", "pink", "white", "gray", "black", "brown"];
-    const Validcolor = searchParam.getAll("colors").filter((ele) => {
+    const Validcolor = Array.from(new Set(searchParam.getAll("colors"))).filter((ele) => {
       return allValidcolor.includes(ele);
     })
     return Validcolor;
@@ -123,91 +140,145 @@ const Main = ({ data, error, ref, isFetching }) => {
   }
 
   const applyColor = (callingMethod) => {
-    let para = new URLSearchParams();
+    let query = "";
 
-    searchParam.has("order") ? para.set("order", searchParam.get("order")) : null;
-
-    searchParam.has("orientation") ? para.set("orientation", searchParam.get("orientation")) : null;
-
-    if (sizeFilter.width > 0) {
-      para.set("min_width", sizeFilter.width);
+    if (searchParam.has("order") && ["ec", "latest", "popular"].includes(searchParam.get("order"))) {
+      query += `order=${searchParam.get("order")}&`
     }
-    if (sizeFilter.height > 0) {
-      para.set("min_height", sizeFilter.height);
+
+    if (["horizontal", "vertical"].includes(searchParam.get("orientation"))) {
+      query += `orientation=${searchParam.get("orientation")}&`
+    }
+
+    if (searchParam.has("min_width") && !isNaN(searchParam.get("min_width"))) {
+      query += `min_width=${searchParam.get("min_width")}&`
+    }
+
+    if (searchParam.has("min_height") && !isNaN(searchParam.get("min_height"))) {
+      query += `min_height=${searchParam.get("min_height")}&`
     }
 
     if (callingMethod === "apply") {
       for (let i = 0; i < colorFilter.length; i++) {
-        para.append("colors", colorFilter[i]);
+        query += `colors=${colorFilter[i]}&`;
       }
     }
 
-    setSearchParam(para);
+    query = query.slice(0, -1);
+
+    setSearchParam(query)
   }
 
-  const handleOrientation = (orientation) => {
-    let para = new URLSearchParams();
+ const handleOrientation = (orientation) => {
+    let query = "";
 
-    searchParam.has("order") ? para.set("order", searchParam.get("order")) : null;
-
-    if (orientation !== "any") {
-      para.append("orientation", orientation);
+    if (searchParam.has("order") && ["ec", "latest", "popular"].includes(searchParam.get("order"))) {
+      query += `order=${searchParam.get("order")}&`
     }
 
-    if (sizeFilter.width > 0) {
-      para.set("min_width", sizeFilter.width);
-    }
-    if (sizeFilter.height > 0) {
-      para.set("min_height", sizeFilter.height);
+    if (["horizontal", "vertical"].includes(orientation)) {
+      query += `orientation=${orientation}&`
     }
 
-    for (let i = 0; i < colorFilter.length; i++) {
-      para.append("colors", colorFilter[i]);
+    if (searchParam.has("min_width") && !isNaN(searchParam.get("min_width"))) {
+      query += `min_width=${searchParam.get("min_width")}&`
     }
 
-    setSearchParam(para);
+    if (searchParam.has("min_height") && !isNaN(searchParam.get("min_height"))) {
+      query += `min_height=${searchParam.get("min_height")}&`
+    }
+
+    if (searchParam.has("colors")) {
+      const newvalidColor = ["grayscale", "transparent", "red", "orange", "yellow", "green", "turquoise", "blue", "lilac", "pink", "white", "gray", "black", "brown"];
+
+      const newcolorArray = Array.from(new Set(searchParam.getAll("colors")));
+
+      let newallValidColor = newcolorArray.filter((colorele) => {
+        return newvalidColor.includes(colorele);
+      })
+
+      for (let i = 0; i < newallValidColor.length; i++) {
+        query += `colors=${newallValidColor[i]}&`;
+      }
+    }
+
+    query = query.slice(0, -1);
+
+    setSearchParam(query);
   }
 
   const categoryFilter = (catagoryFil) => {
-    let para = new URLSearchParams();
+    let query = "";
 
-    searchParam.has("order") ? para.set("order", searchParam.get("order")) : null;
-
-    searchParam.has("orientation") ? para.set("orientation", searchParam.get("orientation")) : null;
-
-    if (sizeFilter.width > 0) {
-      para.set("min_width", sizeFilter.width);
-    }
-    if (sizeFilter.height > 0) {
-      para.set("min_height", sizeFilter.height);
+    if (searchParam.has("order") && ["ec", "latest", "popular"].includes(searchParam.get("order"))) {
+      query += `order=${searchParam.get("order")}&`
     }
 
-    for (let i = 0; i < colorFilter.length; i++) {
-      para.append("colors", colorFilter[i]);
+    if (["horizontal", "vertical"].includes(searchParam.get("orientation"))) {
+      query += `orientation=${searchParam.get("orientation")}&`
     }
 
-    navigate(`${loc.pathname.replace(cat, catagoryFil)}?${para}`)
+    if (searchParam.has("min_width") && !isNaN(searchParam.get("min_width"))) {
+      query += `min_width=${searchParam.get("min_width")}&`
+    }
+
+    if (searchParam.has("min_height") && !isNaN(searchParam.get("min_height"))) {
+      query += `min_height=${searchParam.get("min_height")}&`
+    }
+
+    if (searchParam.has("colors")) {
+      const newvalidColor = ["grayscale", "transparent", "red", "orange", "yellow", "green", "turquoise", "blue", "lilac", "pink", "white", "gray", "black", "brown"];
+
+      const newcolorArray = Array.from(new Set(searchParam.getAll("colors")));
+
+      let newallValidColor = newcolorArray.filter((colorele) => {
+        return newvalidColor.includes(colorele);
+      })
+
+      for (let i = 0; i < newallValidColor.length; i++) {
+        query += `colors=${newallValidColor[i]}&`;
+      }
+    }
+
+    query = query.slice(0, -1);
+
+    navigate(`/${catagoryFil}/search/${query ? `?${query}` : ""}`)
   }
 
   const orderFilter = (order) => {
-    let para = new URLSearchParams();
+    let query = "";
 
-    para.set("order", order);
+    query += `order=${order}&`
 
-    searchParam.has("orientation") ? para.set("orientation", searchParam.get("orientation")) : null;
-
-    if (sizeFilter.width > 0) {
-      para.set("min_width", sizeFilter.width);
-    }
-    if (sizeFilter.height > 0) {
-      para.set("min_height", sizeFilter.height);
+    if (["horizontal", "vertical"].includes(searchParam.get("orientation"))) {
+      query += `orientation=${searchParam.get("orientation")}&`
     }
 
-    for (let i = 0; i < colorFilter.length; i++) {
-      para.append("colors", colorFilter[i]);
+    if (searchParam.has("min_width") && !isNaN(searchParam.get("min_width"))) {
+      query += `min_width=${searchParam.get("min_width")}&`
     }
 
-    setSearchParam(para);
+    if (searchParam.has("min_height") && !isNaN(searchParam.get("min_height"))) {
+      query += `min_height=${searchParam.get("min_height")}&`
+    }
+
+    if (searchParam.has("colors")) {
+      const newvalidColor = ["grayscale", "transparent", "red", "orange", "yellow", "green", "turquoise", "blue", "lilac", "pink", "white", "gray", "black", "brown"];
+
+      const newcolorArray = Array.from(new Set(searchParam.getAll("colors")));
+
+      let newallValidColor = newcolorArray.filter((colorele) => {
+        return newvalidColor.includes(colorele);
+      })
+
+      for (let i = 0; i < newallValidColor.length; i++) {
+        query += `colors=${newallValidColor[i]}&`;
+      }
+    }
+
+    query = query.slice(0, -1);
+
+    setSearchParam(query);
   }
 
   const [filterCount, setFilterCount] = useState(0);
@@ -215,11 +286,36 @@ const Main = ({ data, error, ref, isFetching }) => {
   useEffect(() => {
     const countFilter = () => {
       let count = 0;
-      if (searchParam.has("orientation")) count += 1;
-      if (searchParam.has("min_width") || searchParam.has("min_height")) count += 1;
-      if (searchParam.has("colors")) count += 1;
+
+      if (searchParam.has("orientation") && ["horizontal", "vertical"].includes(searchParam.get("orientation"))) {
+        count++;
+      }
+
+      if (searchParam.has("min_width") && !isNaN(searchParam.get("min_width"))) {
+        count++;
+      }
+
+      if (searchParam.has("min_height") && !isNaN(searchParam.get("min_height"))) {
+        count++;
+      }
+
+      if (searchParam.has("colors")) {
+        const newvalidColor = ["grayscale", "transparent", "red", "orange", "yellow", "green", "turquoise", "blue", "lilac", "pink", "white", "gray", "black", "brown"];
+
+        const newcolorArray = Array.from(new Set(searchParam.getAll("colors")));
+
+        let newallValidColor = newcolorArray.filter((colorele) => {
+          return newvalidColor.includes(colorele);
+        })
+
+        for (let i = 0; i < newallValidColor.length; i++) {
+          count++;
+        }
+      }
+
       return count
     }
+
     setFilterCount(countFilter())
   }, [searchParam, loc.search, filterCount])
 
@@ -252,11 +348,43 @@ const Main = ({ data, error, ref, isFetching }) => {
     return () => window.removeEventListener("click", handleCatAnywhere);
   }, [size])
 
+  const clearSize = () => {
+    let query = "";
+
+    if (searchParam.has("order") && ["ec", "latest", "popular"].includes(searchParam.get("order"))) {
+      query += `order=${searchParam.get("order")}&`
+    }
+
+    if (["horizontal", "vertical"].includes(searchParam.get("orientation"))) {
+      query += `orientation=${searchParam.get("orientation")}&`
+    }
+
+    if (searchParam.has("colors")) {
+      const newvalidColor = ["grayscale", "transparent", "red", "orange", "yellow", "green", "turquoise", "blue", "lilac", "pink", "white", "gray", "black", "brown"];
+
+      const newcolorArray = Array.from(new Set(searchParam.getAll("colors")));
+
+      let newallValidColor = newcolorArray.filter((colorele) => {
+        return newvalidColor.includes(colorele);
+      })
+
+      for (let i = 0; i < newallValidColor.length; i++) {
+        query += `colors=${newallValidColor[i]}&`;
+      }
+    }
+
+    query = query.slice(0, -1);
+
+    setSearchParam(query)
+
+    setSizeFilter({ width: 0, height: 0 })
+  }
+
   if (error) return <div className='main-div'>
     <div className="upper">
       <div className="upper-wrapper">
         <div className={size < 1025 ? "filter1-mob" : "filter1-web"}>
-          {size < 1025 && <button onClick={() => { setFilter(!filter) }}><i className="ri-equalizer-2-fill"></i> Filter {filterCount !== 0 && <span>(1)</span>}</button>}
+          {size < 1025 && <button onClick={() => { setFilter(!filter) }}><i className="ri-equalizer-2-fill"></i> Filters {filterCount !== 0 && <span>({filterCount})</span>}</button>}
           {(size >= 1025 || filter) && <div className={size < 1025 ? "slider mobile" : "slider web"}>
             <div className="filter1-wrapper">
               {size < 1025 && <div className="header-filter">
@@ -314,23 +442,23 @@ const Main = ({ data, error, ref, isFetching }) => {
                 </details>
                 <details className='orientation'>
                   <summary id='orientationslider' >
-                    {searchParam.has("orientation") ? searchParam.get("orientation").substring(0, 1).toUpperCase() + searchParam.get("orientation").substring(1) : "Orientation"}<i className="ri-arrow-down-s-line"></i>
+                    {searchParam.has("orientation") && ["horizontal", "vertical"].includes(searchParam.get("orientation")) ? searchParam.get("orientation").substring(0, 1).toUpperCase() + searchParam.get("orientation").substring(1) : "Orientation"}<i className="ri-arrow-down-s-line"></i>
                   </summary>
                   <div>
-                    <span className={!searchParam.has("orientation") || (searchParam.get("orientation") !== "horizontal" && searchParam.get("orientation") !== "verticle") ? 'cat-1 green' : 'cat-1'} onClick={() => handleOrientation("any")}>
+                    <span className={!searchParam.has("orientation") || (searchParam.get("orientation") !== "horizontal" && searchParam.get("orientation") !== "vartical") ? 'cat-1 green' : 'cat-1'} onClick={() => handleOrientation("any")}>
                       Any
                     </span>
                     <span className={searchParam.get("orientation") === "horizontal" ? 'cat-1 green' : 'cat-1'} onClick={() => handleOrientation("horizontal")}>
                       Horizontal
                     </span>
-                    <span className={searchParam.get("orientation") === "verticle" ? 'cat-3 green' : 'cat-3'} onClick={() => handleOrientation("verticle")}>
+                    <span className={searchParam.get("orientation") === "vartical" ? 'cat-3 green' : 'cat-3'} onClick={() => handleOrientation("vartical")}>
                       Vertical
                     </span>
                   </div>
                 </details>
                 <details className='size' id='sizeslider'>
                   <summary>
-                    {searchParam.has("min_width") && searchParam.has("min_height") ? `> ${searchParam.get("min_width")} x ${searchParam.get("min_height")}` : searchParam.has("min_width") ? `> ${searchParam.get("min_width")} wide` : searchParam.has("min_height") ? `> ${searchParam.get("min_height")} high` : "Size"} <i className="ri-arrow-down-s-line"></i>
+                    {(searchParam.has("min_width") && !isNaN(searchParam.get("min_width"))) && (searchParam.has("min_height") && !isNaN(searchParam.get("min_height"))) ? `> ${searchParam.get("min_width")} x ${searchParam.get("min_height")}` : (searchParam.has("min_width") && !isNaN(searchParam.get("min_width"))) ? `> ${searchParam.get("min_width")} wide` : (searchParam.has("min_height") && !isNaN(searchParam.get("min_height"))) ? `> ${searchParam.get("min_height")} high` : "Sizes"} <i className="ri-arrow-down-s-line"></i>
                   </summary>
                   {size < 1025 ? <form onSubmit={handleSubmiteSize}>
                     <div>Larger than</div>
@@ -341,11 +469,7 @@ const Main = ({ data, error, ref, isFetching }) => {
                     </div>
                     <div>
                       <button type='button' onClick={() => {
-                        const prevParam = new URLSearchParams(searchParam);
-                        prevParam.delete("min_width")
-                        prevParam.delete("min_height");
-                        setSearchParam(prevParam)
-                        setSizeFilter({ width: 0, height: 0 })
+                        clearSize()
                         const slider = document.querySelector(".slider")
                         slider.classList.add("go")
                         slider.addEventListener('animationend', () => {
@@ -371,11 +495,7 @@ const Main = ({ data, error, ref, isFetching }) => {
                     </section>
                     <section>
                       <button onClick={() => {
-                        const prevParam = new URLSearchParams(searchParam);
-                        prevParam.delete("min_width")
-                        prevParam.delete("min_height");
-                        setSearchParam(prevParam)
-                        setSizeFilter({ width: 0, height: 0 })
+                        clearSize()
                         document.getElementById("sizeslider").removeAttribute("open")
                       }}><i className="ri-delete-bin-6-fill"></i> Clear</button>
                       <button onClick={(e) => { handleSubmiteSize(e); document.getElementById("sizeslider").removeAttribute("open") }}>Apply</button>
@@ -441,7 +561,7 @@ const Main = ({ data, error, ref, isFetching }) => {
                 </details>
                 {(searchParam.has("orientation") || searchParam.has("min_width") || searchParam.has("min_height") || searchParam.has("colors")) && <button className='globalClear' onClick={() => {
                   const para = new URLSearchParams();
-                  searchParam.has("order") ? para.set("order", searchParam.get("order")) : null;
+                  searchParam.has("order") && ["ec", "latest", "popular"].includes(searchParam.get("order")) ? para.set("order", searchParam.get("order")) : null;
                   setSearchParam(para);
                   const slider = document.querySelector(".slider")
                   slider.classList.add("go")
@@ -490,7 +610,7 @@ const Main = ({ data, error, ref, isFetching }) => {
     <div className="upper">
       <div className="upper-wrapper">
         <div className={size < 1025 ? "filter1-mob" : "filter1-web"}>
-          {size < 1025 && <button onClick={() => { setFilter(!filter) }}><i className="ri-equalizer-2-fill"></i> Filter {filterCount !== 0 && <span>(1)</span>}</button>}
+          {size < 1025 && <button onClick={() => { setFilter(!filter) }}><i className="ri-equalizer-2-fill"></i> Filters {filterCount !== 0 && <span>({filterCount})</span>}</button>}
           {(size >= 1025 || filter) && <div className={size < 1025 ? "slider mobile" : "slider web"}>
             <div className="filter1-wrapper">
               {size < 1025 && <div className="header-filter">
@@ -548,23 +668,23 @@ const Main = ({ data, error, ref, isFetching }) => {
                 </details>
                 <details className='orientation'>
                   <summary id='orientationslider' >
-                    {searchParam.has("orientation") ? searchParam.get("orientation").substring(0, 1).toUpperCase() + searchParam.get("orientation").substring(1) : "Orientation"}<i className="ri-arrow-down-s-line"></i>
+                    {searchParam.has("orientation") && ["horizontal", "vertical"].includes(searchParam.get("orientation")) ? searchParam.get("orientation").substring(0, 1).toUpperCase() + searchParam.get("orientation").substring(1) : "Orientation"}<i className="ri-arrow-down-s-line"></i>
                   </summary>
                   <div>
-                    <span className={!searchParam.has("orientation") || (searchParam.get("orientation") !== "horizontal" && searchParam.get("orientation") !== "verticle") ? 'cat-1 green' : 'cat-1'} onClick={() => handleOrientation("any")}>
+                    <span className={!searchParam.has("orientation") || (searchParam.get("orientation") !== "horizontal" && searchParam.get("orientation") !== "vartical") ? 'cat-1 green' : 'cat-1'} onClick={() => handleOrientation("any")}>
                       Any
                     </span>
                     <span className={searchParam.get("orientation") === "horizontal" ? 'cat-1 green' : 'cat-1'} onClick={() => handleOrientation("horizontal")}>
                       Horizontal
                     </span>
-                    <span className={searchParam.get("orientation") === "verticle" ? 'cat-3 green' : 'cat-3'} onClick={() => handleOrientation("verticle")}>
+                    <span className={searchParam.get("orientation") === "vartical" ? 'cat-3 green' : 'cat-3'} onClick={() => handleOrientation("vartical")}>
                       Vertical
                     </span>
                   </div>
                 </details>
                 <details className='size' id='sizeslider'>
                   <summary>
-                    {searchParam.has("min_width") && searchParam.has("min_height") ? `> ${searchParam.get("min_width")} x ${searchParam.get("min_height")}` : searchParam.has("min_width") ? `> ${searchParam.get("min_width")} wide` : searchParam.has("min_height") ? `> ${searchParam.get("min_height")} high` : "Size"} <i className="ri-arrow-down-s-line"></i>
+                    {(searchParam.has("min_width") && !isNaN(searchParam.get("min_width"))) && (searchParam.has("min_height") && !isNaN(searchParam.get("min_height"))) ? `> ${searchParam.get("min_width")} x ${searchParam.get("min_height")}` : (searchParam.has("min_width") && !isNaN(searchParam.get("min_width"))) ? `> ${searchParam.get("min_width")} wide` : (searchParam.has("min_height") && !isNaN(searchParam.get("min_height"))) ? `> ${searchParam.get("min_height")} high` : "Sizes"} <i className="ri-arrow-down-s-line"></i>
                   </summary>
                   {size < 1025 ? <form onSubmit={handleSubmiteSize}>
                     <div>Larger than</div>
@@ -575,11 +695,7 @@ const Main = ({ data, error, ref, isFetching }) => {
                     </div>
                     <div>
                       <button type='button' onClick={() => {
-                        const prevParam = new URLSearchParams(searchParam);
-                        prevParam.delete("min_width")
-                        prevParam.delete("min_height");
-                        setSearchParam(prevParam)
-                        setSizeFilter({ width: 0, height: 0 })
+                        clearSize()
                         const slider = document.querySelector(".slider")
                         slider.classList.add("go")
                         slider.addEventListener('animationend', () => {
@@ -605,11 +721,7 @@ const Main = ({ data, error, ref, isFetching }) => {
                     </section>
                     <section>
                       <button onClick={() => {
-                        const prevParam = new URLSearchParams(searchParam);
-                        prevParam.delete("min_width")
-                        prevParam.delete("min_height");
-                        setSearchParam(prevParam)
-                        setSizeFilter({ width: 0, height: 0 })
+                        clearSize()
                         document.getElementById("sizeslider").removeAttribute("open")
                       }}><i className="ri-delete-bin-6-fill"></i> Clear</button>
                       <button onClick={(e) => { handleSubmiteSize(e); document.getElementById("sizeslider").removeAttribute("open") }}>Apply</button>
@@ -675,7 +787,7 @@ const Main = ({ data, error, ref, isFetching }) => {
                 </details>
                 {(searchParam.has("orientation") || searchParam.has("min_width") || searchParam.has("min_height") || searchParam.has("colors")) && <button className='globalClear' onClick={() => {
                   const para = new URLSearchParams();
-                  searchParam.has("order") ? para.set("order", searchParam.get("order")) : null;
+                  searchParam.has("order") && ["ec", "latest", "popular"].includes(searchParam.get("order")) ? para.set("order", searchParam.get("order")) : null;
                   setSearchParam(para);
                   const slider = document.querySelector(".slider")
                   slider.classList.add("go")
@@ -724,7 +836,7 @@ const Main = ({ data, error, ref, isFetching }) => {
     <div className="upper">
       <div className="upper-wrapper">
         <div className={size < 1025 ? "filter1-mob" : "filter1-web"}>
-          {size < 1025 && <button onClick={() => { setFilter(!filter) }}><i className="ri-equalizer-2-fill"></i> Filter {filterCount !== 0 && <span>(1)</span>}</button>}
+          {size < 1025 && <button onClick={() => { setFilter(!filter) }}><i className="ri-equalizer-2-fill"></i> Filters {filterCount !== 0 && <span>({filterCount})</span>}</button>}
           {(size >= 1025 || filter) && <div className={size < 1025 ? "slider mobile" : "slider web"}>
             <div className="filter1-wrapper">
               {size < 1025 && <div className="header-filter">
@@ -782,23 +894,23 @@ const Main = ({ data, error, ref, isFetching }) => {
                 </details>
                 <details className='orientation'>
                   <summary id='orientationslider' >
-                    {searchParam.has("orientation") ? searchParam.get("orientation").substring(0, 1).toUpperCase() + searchParam.get("orientation").substring(1) : "Orientation"}<i className="ri-arrow-down-s-line"></i>
+                    {searchParam.has("orientation") && ["horizontal", "vertical"].includes(searchParam.get("orientation")) ? searchParam.get("orientation").substring(0, 1).toUpperCase() + searchParam.get("orientation").substring(1) : "Orientation"}<i className="ri-arrow-down-s-line"></i>
                   </summary>
                   <div>
-                    <span className={!searchParam.has("orientation") || (searchParam.get("orientation") !== "horizontal" && searchParam.get("orientation") !== "verticle") ? 'cat-1 green' : 'cat-1'} onClick={() => handleOrientation("any")}>
+                    <span className={!searchParam.has("orientation") || (searchParam.get("orientation") !== "horizontal" && searchParam.get("orientation") !== "vartical") ? 'cat-1 green' : 'cat-1'} onClick={() => handleOrientation("any")}>
                       Any
                     </span>
                     <span className={searchParam.get("orientation") === "horizontal" ? 'cat-1 green' : 'cat-1'} onClick={() => handleOrientation("horizontal")}>
                       Horizontal
                     </span>
-                    <span className={searchParam.get("orientation") === "verticle" ? 'cat-3 green' : 'cat-3'} onClick={() => handleOrientation("verticle")}>
+                    <span className={searchParam.get("orientation") === "vartical" ? 'cat-3 green' : 'cat-3'} onClick={() => handleOrientation("vartical")}>
                       Vertical
                     </span>
                   </div>
                 </details>
                 <details className='size' id='sizeslider'>
                   <summary>
-                    {searchParam.has("min_width") && searchParam.has("min_height") ? `> ${searchParam.get("min_width")} x ${searchParam.get("min_height")}` : searchParam.has("min_width") ? `> ${searchParam.get("min_width")} wide` : searchParam.has("min_height") ? `> ${searchParam.get("min_height")} high` : "Size"} <i className="ri-arrow-down-s-line"></i>
+                    {(searchParam.has("min_width") && !isNaN(searchParam.get("min_width"))) && (searchParam.has("min_height") && !isNaN(searchParam.get("min_height"))) ? `> ${searchParam.get("min_width")} x ${searchParam.get("min_height")}` : (searchParam.has("min_width") && !isNaN(searchParam.get("min_width"))) ? `> ${searchParam.get("min_width")} wide` : (searchParam.has("min_height") && !isNaN(searchParam.get("min_height"))) ? `> ${searchParam.get("min_height")} high` : "Sizes"} <i className="ri-arrow-down-s-line"></i>
                   </summary>
                   {size < 1025 ? <form onSubmit={handleSubmiteSize}>
                     <div>Larger than</div>
@@ -809,11 +921,7 @@ const Main = ({ data, error, ref, isFetching }) => {
                     </div>
                     <div>
                       <button type='button' onClick={() => {
-                        const prevParam = new URLSearchParams(searchParam);
-                        prevParam.delete("min_width")
-                        prevParam.delete("min_height");
-                        setSearchParam(prevParam)
-                        setSizeFilter({ width: 0, height: 0 })
+                        clearSize()
                         const slider = document.querySelector(".slider")
                         slider.classList.add("go")
                         slider.addEventListener('animationend', () => {
@@ -839,11 +947,7 @@ const Main = ({ data, error, ref, isFetching }) => {
                     </section>
                     <section>
                       <button onClick={() => {
-                        const prevParam = new URLSearchParams(searchParam);
-                        prevParam.delete("min_width")
-                        prevParam.delete("min_height");
-                        setSearchParam(prevParam)
-                        setSizeFilter({ width: 0, height: 0 })
+                        clearSize()
                         document.getElementById("sizeslider").removeAttribute("open")
                       }}><i className="ri-delete-bin-6-fill"></i> Clear</button>
                       <button onClick={(e) => { handleSubmiteSize(e); document.getElementById("sizeslider").removeAttribute("open") }}>Apply</button>
@@ -909,7 +1013,7 @@ const Main = ({ data, error, ref, isFetching }) => {
                 </details>
                 {(searchParam.has("orientation") || searchParam.has("min_width") || searchParam.has("min_height") || searchParam.has("colors")) && <button className='globalClear' onClick={() => {
                   const para = new URLSearchParams();
-                  searchParam.has("order") ? para.set("order", searchParam.get("order")) : null;
+                  searchParam.has("order") && ["ec", "latest", "popular"].includes(searchParam.get("order")) ? para.set("order", searchParam.get("order")) : null;
                   setSearchParam(para);
                   const slider = document.querySelector(".slider")
                   slider.classList.add("go")
@@ -947,7 +1051,7 @@ const Main = ({ data, error, ref, isFetching }) => {
       </div>
     </div>
     <div className="middle">
-      <h2>{data && data.pages[0].total.toLocaleString("en-IN")} free {cat}</h2>
+      <h2 style={{textTransform : "capitalize"}}>{data && data.pages[0].total.toLocaleString("en-IN")} Free {text} {cat}</h2>
     </div>
     <div className="lower">
       <div className="lower-heading">Royalty-free vectors</div>

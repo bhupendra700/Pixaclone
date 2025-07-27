@@ -95,44 +95,44 @@ const Main = ({ singleData, safeSearch, setSafeSearch, authTrace, setAuthTrace, 
     }
   }
 
-  const [query, setQuery] = useState("");
+  const [url, setUrl] = useState("");
 
-  const fetchAPI = async ({ pageParam = 1 }) => {
-    let safeSearchQuery = safeSearch === "" ? true : safeSearch;
+  useEffect(() => {
+    if (singleData.total > 0) {
+      const tagsArr = singleData?.hits[0]?.tags.split(",");
+      let query = "";
+      for (let tag of tagsArr) {
+        if ((query + tag.trim() + " ").length < 100) {
+          query += tag.trim() + " ";
+        }
+      }
 
-    let url = ["film", "animation"].includes(singleData.hits[0].type) ? `https://pixabay.com/api/videos/?key=${import.meta.env.VITE_API_KEY}${query !== "@true" ? `&q=${encodeURIComponent(query)}` : ""}&safesearch=${safeSearchQuery}&per_page=30&page=${pageParam}` : `https://pixabay.com/api/?key=${import.meta.env.VITE_API_KEY}${query !== "@true" ? `&q=${encodeURIComponent(query)}` : ""}&safesearch=${safeSearchQuery}&per_page=30&page=${pageParam}`
+      let safeSearchQuery = safeSearch === "" ? true : safeSearch;
 
-    const res = await axios.get(url);
+      setUrl(["film", "animation"].includes(singleData?.hits[0]?.type) ? `https://pixabay.com/api/videos/?key=${import.meta.env.VITE_API_KEY}${query ? `&q=${encodeURIComponent(query.trim().replace(/\s+/g , ' '))}` : ""}&safesearch=${safeSearchQuery}&per_page=30` : `https://pixabay.com/api/?key=${import.meta.env.VITE_API_KEY}&image_type=all${query ? `&q=${encodeURIComponent(query.trim().replace(/\s+/g , ' '))}` : ""}&safesearch=${safeSearchQuery}&per_page=30`)
+    }
+  }, [singleData, safeSearch])
+
+  const fetchAPI = async ({ pageParam = 1 , queryKey}) => {
+    const [_key , urlKey] = queryKey
+
+    const finalUrl = urlKey + `&page=${pageParam}`
+    
+    const res = await axios.get(finalUrl);
+
     return res.data
   }
 
   const { data, error, fetchNextPage } = useInfiniteQuery({
-    queryKey: ["data", safeSearch, ["film", "animation"].includes(singleData.hits[0].type) ? "videos" : singleData.hits[0].type.split("/")[0] + "s", singleData.hits[0].id],
+    queryKey: ["Single_Data", url],
     queryFn: fetchAPI,
     staleTime: 1000 * 60 * 60,
     getNextPageParam: (lastPages, allPages) => {
       return lastPages.totalHits / 30 > allPages.length ? allPages.length + 1 : undefined;
     },
-    enabled: !!query,
+    enabled: !!url,
     placeholderData: keepPreviousData,
   })
-
-  useEffect(() => {
-    if (singleData.total > 0) {
-      const tagsArr = singleData.hits[0].tags.split(",");
-      let qy = "";
-      for (let tag of tagsArr) {
-        if ((qy + tag.trim() + " ").length < 100) {
-          qy += tag.trim() + " ";
-        }
-      }
-      if (qy === "") {
-        setQuery("@true")
-      } else {
-        setQuery(qy)
-      }
-    }
-  }, [singleData])
 
   useEffect(() => {
     if (error) {

@@ -102,39 +102,53 @@ const Header = ({ safeSearch, setSafeSearch }) => {
 
     const [searchParam] = useSearchParams();
 
-    const navigateToUrl = () => {
+    const [searchQuery, setSearchQuery] = useState(text.trim());
+
+    useEffect(() => {
+        setSearchQuery(text.trim())
+    }, [loc.pathname, text])
+
+    const filterSearchParam = (method) => {
         let query = "";
 
-        let order = searchParam.has("order") ? `&order=${searchParam.get("order")}` : null
-        order ? query += order : null;
+        if (searchParam.has("order") && ["ec", "latest", "popular"].includes(searchParam.get("order"))) {
+            query += `order=${searchParam.get("order")}&`
+        }
 
-        searchParam.has("orientation") ? query += `&orientation=${searchParam.get("orientation")}` : null;
+        if (searchParam.has("orientation") && ["horizontal", "vertical"].includes(searchParam.get("orientation"))) {
+            query += `orientation=${searchParam.get("orientation")}&`
+        }
 
-        searchParam.has("min_width") ? query += `&min_width=${searchParam.get("min_width")}` : null;
-        searchParam.has("min_height") ? query += `&min_height=${searchParam.get("min_height")}` : null;
+        if (searchParam.has("min_width") && !isNaN(searchParam.get("min_width"))) {
+            query += `min_width=${searchParam.get("min_width")}&`
+        }
+
+        if (searchParam.has("min_height") && !isNaN(searchParam.get("min_height"))) {
+            query += `min_height=${searchParam.get("min_height")}&`
+        }
 
         if (searchParam.has("colors")) {
             const validColor = ["grayscale", "transparent", "red", "orange", "yellow", "green", "turquoise", "blue", "lilac", "pink", "white", "gray", "black", "brown"];
 
-            const colorArray = searchParam.getAll("colors");
+            const colorArray = Array.from(new Set(searchParam.getAll("colors")));
 
             let allValidColor = colorArray.filter((colorele) => {
                 return validColor.includes(colorele);
             })
 
             for (let i = 0; i < allValidColor.length; i++) {
-                query += `&colors=${allValidColor[i]}`;
+                query += `colors=${allValidColor[i]}&`;
             }
         }
 
-        navigate(`/${topCat}/search/${searchQuery.trim()}${query !== "" ? `/?${query}` : "/"}`)
+        query = query.slice(0, -1);
+
+        if (method === "full") {
+            navigate(`/${topCat}/search/${searchQuery.toLowerCase()}/${query ? `?${query}` : ""}`)
+        } else {
+            navigate(`/${topCat}/search/${query ? `?${query}` : ""}`)
+        }
     }
-
-    const [searchQuery, setSearchQuery] = useState(text.trim());
-
-    useEffect(() => {
-        setSearchQuery(text.trim())
-    }, [loc.pathname, text])
 
     const [profile, setProfile] = useState(false);
 
@@ -156,18 +170,17 @@ const Header = ({ safeSearch, setSafeSearch }) => {
                 {size > 330 && <div className="search">
                     <i className="search-icon ri-search-line" onClick={() => {
                         if (searchQuery !== "") {
-                            navigateToUrl()
+                            filterSearchParam("full")
                         } else {
-                            navigate("/" + loc.pathname.split("/").slice(2, 3).join("/") + loc.search);
+                            filterSearchParam("empty")
                         }
                     }}></i>
                     <input type="search" placeholder='Search Pixabay' value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value) }} onKeyDown={(e) => {
                         if (e.key === "Enter") {
                             if (searchQuery !== "") {
-                                navigateToUrl()
-
+                                filterSearchParam("full")
                             } else {
-                                navigate(`/${topCat}/` + loc.pathname.split("/").slice(2, 3).join("/") + loc.search);
+                                filterSearchParam("empty")
                             }
                         }
                     }} />

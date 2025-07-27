@@ -26,23 +26,35 @@ const Page2Search = () => {
 
     const { cat, text } = useParams();
 
-    const [searchParam, setSearchParam] = useSearchParams();
+    const [searchParam] = useSearchParams();
 
     const loc = useLocation();
 
     useEffect(() => {
-        let safeSearchQuery = safeSearch === "" ? true : safeSearch;
-
         let query = "";
-        searchParam.has("orientation") ? query += "&orientation=" + searchParam.get("orientation") : null;
 
-        searchParam.has("min_width") ? query += "&min_width=" + searchParam.get("min_width") : null;
-        searchParam.has("min_height") ? query += "&min_height=" + searchParam.get("min_height") : null;
+        if(text.trim()){
+            query += `&q=${encodeURIComponent(text.trim().replace(/\s+/g, ' '))}`
+        }
+
+        query += searchParam.get("order") === "popular" ? "&order=popular" : searchParam.get("order") === "latest" ? "&editors_choice=false&order=latest" : "&editors_choice=true"
+
+        if (searchParam.has("orientation") && ["horizontal", "vertical"].includes(searchParam.get("orientation"))) {
+            query += `&orientation=${searchParam.get("orientation")}`
+        }
+
+        if (searchParam.has("min_width") && !isNaN(searchParam.get("min_width"))) {
+            query += `&min_width=${searchParam.get("min_width")}`
+        }
+
+        if (searchParam.has("min_height") && !isNaN(searchParam.get("min_height"))) {
+            query += `&min_height=${searchParam.get("min_height")}`
+        }
 
         if (searchParam.has("colors")) {
             const validColor = ["grayscale", "transparent", "red", "orange", "yellow", "green", "turquoise", "blue", "lilac", "pink", "white", "gray", "black", "brown"];
 
-            const colorArray = searchParam.getAll("colors");
+            const colorArray = Array.from(new Set(searchParam.getAll("colors")));
 
             let allValidColor = colorArray.filter((colorele) => {
                 return validColor.includes(colorele);
@@ -53,17 +65,21 @@ const Page2Search = () => {
             }
         }
 
-        let order = searchParam.get("order") === "ec" ? "editors_choice=true" : searchParam.get("order") === "popular" ? "order=popular" : "editors_choice=false&order=latest";
+        query += safeSearch === "" ? "&safesearch=true" : `&safesearch=${safeSearch}`;
 
-        setUrl(cat === "videos" ? `https://pixabay.com/api/videos/?key=${import.meta.env.VITE_API_KEY}&per_page=100&${order}&safesearch=${safeSearchQuery}${query}&q=${text}` : cat === "images" ? `https://pixabay.com/api/?key=${import.meta.env.VITE_API_KEY}&image_type=all&per_page=100&${order}&safesearch=${safeSearchQuery}${query}&q=${text}` : `https://pixabay.com/api/?key=${import.meta.env.VITE_API_KEY}&image_type=${cat.substring(0, cat.length - 1)}&per_page=100&${order}&safesearch=${safeSearchQuery}${query}&q=${text}`);
+        setUrl(cat === "videos" ? `https://pixabay.com/api/videos/?key=${import.meta.env.VITE_API_KEY}&per_page=100${query}` : cat === "images" ? `https://pixabay.com/api/?key=${import.meta.env.VITE_API_KEY}&image_type=all&per_page=100${query}` : `https://pixabay.com/api/?key=${import.meta.env.VITE_API_KEY}&image_type=${cat.slice(0, -1)}&per_page=100${query}`);
 
-    }, [searchParam, loc.pathname, safeSearch])
+    }, [searchParam, loc.pathname, safeSearch, text])
 
     const { ref, inView } = useInView()
 
-    const fetchAPI = async ({ pageParam = 1 }) => {
+    const fetchAPI = async ({ pageParam = 1, queryKey }) => {
+        const [_key, urlKey] = queryKey;
+
+        const finalUrl = urlKey + `&page=${pageParam}`
+
         try {
-            const res = await axios.get(url + `&page=${pageParam}`);
+            const res = await axios.get(finalUrl);
             return res.data;
         } catch (error) {
             throw error
@@ -72,7 +88,7 @@ const Page2Search = () => {
     }
 
     let { data, error, isFetching, fetchNextPage } = useInfiniteQuery({
-        queryKey: ["search", url],
+        queryKey: ["searchQuery", url],
         queryFn: fetchAPI,
         getNextPageParam: (lastPages, allPages) => {
             return lastPages.totalHits / 100 > allPages.length ? allPages.length + 1 : undefined;
@@ -89,10 +105,18 @@ const Page2Search = () => {
     }, [inView])
 
     useEffect(() => {
-        document.title = `${(data && data.pages[0].total > 0) ? `${data.pages[0].total.toLocaleString("en-IN")} - Free ${cat.slice(0, 1).toUpperCase() + cat.slice(1)} on Pixaclone` : `Free ${cat.slice(0, 1).toUpperCase() + cat.slice(1)} on Pixaclone`}`;
+        document.title = `${(data && data.pages[0].total > 0) ? `${data.pages[0].total.toLocaleString("en-IN")} - Free ${text.trim().replace(/\s+/g , ' ').split(" ").map((ele)=> ele.substring(0,1).toUpperCase()+ele.substring(1)).join(" ")} ${cat.slice(0, 1).toUpperCase() + cat.slice(1)} on Pixaclone` : `Free ${cat.slice(0, 1).toUpperCase() + cat.slice(1)} on Pixaclone`}`;
     }, [loc.pathname, data])
 
-    if (!error && !data) return <></>
+    useEffect(() => {
+        window.scrollTo({
+            top: 0,
+        })
+    }, [cat, searchParam, data])
+
+    if (error) return <></>
+
+    if (!data) return <></>
 
     return <>
         <Header safeSearch={safeSearch} setSafeSearch={setSafeSearch} />

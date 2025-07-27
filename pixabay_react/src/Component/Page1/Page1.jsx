@@ -1,16 +1,18 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import Hero from "./Hero"
 import Main from "./Main"
 import Footer from "./Footer";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 const Page1 = () => {
   const loc = useLocation();
-  
+
+  const {cat} = useParams();
+
   const [searchParam] = useSearchParams();
-  
-   //for safe search
+
+  //for safe search
   const [safeSearch, setSafeSearch] = useState(localStorage.getItem('safeSearch') ? localStorage.getItem('safeSearch') === 'true' ? true : false : "");
 
   //setting safeSearch in localStorage
@@ -18,42 +20,43 @@ const Page1 = () => {
     if (safeSearch !== "") localStorage.setItem("safeSearch", safeSearch);
   }, [safeSearch]);
 
-  const queryParams = useMemo(() => {
-    return {
-      pathname: loc.pathname,
-      order: (searchParam.get("order") !== "latest" && searchParam.get("order") !== "popular") ? "editors_choice=true" : searchParam.get("order") === "popular" ? "order=popular" : "editors_choice=false&order=latest",
-      safeSearchquery : safeSearch === "" ? true : safeSearch,
-    }
-  }, [loc.pathname, searchParam , safeSearch]);
+  const [url , setUrl] = useState("");
 
-  const [fetchedData , setFetchedData] = useState(undefined);
+  useEffect(()=>{
+    const order = searchParam.get("order") === "popular" ? "order=popular" : searchParam.get("order") === "latest" ? "editors_choice=false&order=latest" : "editors_choice=true"
+
+    const safeSearchquery = safeSearch === "" ? true : safeSearch;
+
+    setUrl(cat ? cat === "videos" ? `https://pixabay.com/api/videos/?key=${import.meta.env.VITE_API_KEY}&per_page=200&${order}&safesearch=${safeSearchquery}` : `https://pixabay.com/api/?key=${import.meta.env.VITE_API_KEY}&image_type=${cat.slice(0,-1)}&per_page=200&${order}&safesearch=${safeSearchquery}` : `https://pixabay.com/api/?key=${import.meta.env.VITE_API_KEY}&image_type=all&per_page=200&${order}&safesearch=${safeSearchquery}`)
+
+  }, [loc.pathname, searchParam, safeSearch])
 
   //fetch data
   const fetchData = async ({ queryKey }) => {
-    let [_key, {pathname , order , safeSearchquery}] = queryKey;
+    let [_key, urlKey] = queryKey;
 
-    const url = `${["/videos/" , "/videos"].includes(pathname) ? `https://pixabay.com/api/videos/?key=${import.meta.env.VITE_API_KEY}&per_page=200&${order}&safesearch=${safeSearchquery}` : pathname === "/" ? `https://pixabay.com/api/?key=${import.meta.env.VITE_API_KEY}&image_type=all&per_page=200&${order}&safesearch=${safeSearchquery}` : `https://pixabay.com/api/?key=${import.meta.env.VITE_API_KEY}&image_type=${pathname.split("/")[1].substring(0, pathname.split("/")[1].length - 1)}&per_page=200&${order}&safesearch=${safeSearchquery}`}`
-    
-    const res = await axios.get(url);
+    const res = await axios.get(urlKey);
     return res.data.hits;
   }
 
   const { data, error } = useQuery({
-    queryKey: ["Home", queryParams],
+    queryKey: ["Home", url],
     queryFn: fetchData,
     placeholderData: keepPreviousData,
     staleTime: 1000 * 60 * 30,
+    gcTime : 1000 * 60 * 30,
+    enabled : !!url
   })
 
-  useEffect(()=>{
-    if(data && data.length > 0){
-      setFetchedData(data);
-    }
-  },[data])
+  useEffect(() => {
+    document.title = `Home - ${loc.pathname === "/" ? "Images" : loc.pathname.slice(1, 2).toUpperCase() + loc.pathname.slice(2, -1)}`;
+  }, [loc.pathname])
 
-  useEffect(()=>{
-    document.title = `Home-${loc.pathname === "/" ? "Images" : loc.pathname.slice(1 , 2).toUpperCase()+loc.pathname.slice(2,-1)}`;
-  },[loc.pathname])
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+    })
+  }, [loc.pathname , data])
 
   useEffect(() => {
     if (error) {
@@ -61,11 +64,11 @@ const Page1 = () => {
     }
   }, [error])
 
-  if (!fetchedData) return <></>
+  if (!data || error) return <></>
 
   return <>
     <Hero setSafeSearch={setSafeSearch} safeSearch={safeSearch} />
-    <Main data={fetchedData} />
+    <Main data={data} />
     <Footer />
   </>
 }

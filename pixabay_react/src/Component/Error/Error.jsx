@@ -112,47 +112,6 @@ const Error = () => {
 
     const navigate = useNavigate();
 
-    const navigatetoUrl = () => {
-        let query = "";
-
-        if (searchParam.has("order") && ["ec", "latest", "popular"].includes(searchParam.get("order"))) {
-            query += `order=${searchParam.get("order")}&`
-        }
-
-        if (searchParam.has("orientation") && ["horizontal", "verticle"].includes(searchParam.get("orientation"))) {
-            query += `orientation=${searchParam.get("orientation")}&`
-        }
-
-        if (searchParam.has("min_width") && !isNaN(searchParam.get("min_width"))) {
-            query += `min_width=${searchParam.get("min_width")}&`
-        }
-
-        if (searchParam.has("min_height") && !isNaN(searchParam.get("min_height"))) {
-            query += `min_height=${searchParam.get("min_height")}&`
-        }
-
-        if (searchParam.has("colors")) {
-            const validColor = ["grayscale", "transparent", "red", "orange", "yellow", "green", "turquoise", "blue", "lilac", "pink", "white", "gray", "black", "brown"];
-
-            const colorArray = searchParam.getAll("colors");
-
-            let allValidColor = colorArray.filter((colorele) => {
-                return validColor.includes(colorele);
-            })
-
-            for (let i = 0; i < allValidColor.length; i++) {
-                query += `colors=${allValidColor[i]}&`;
-            }
-        }
-
-
-        if (inputquery === "") {
-            navigate(`/${topCat}/search/${query !== "" ? `?${query.slice(0, -1)}` : ""}`);
-        } else {
-            navigate(`/${topCat}/search/${inputquery}/${query !== "" ? `?${query.slice(0, -1)}` : ""}`);
-        }
-    }
-
     const [authTrace, setAuthTrace] = useState("");
 
     useEffect(() => {
@@ -175,6 +134,46 @@ const Error = () => {
     const [showDelete, setShowDelete] = useState(false)
 
     const [isForgot, setIsForgot] = useState(false)
+
+    const filterSearchParam = (status) => {
+        let query = "";
+
+        if (searchParam.has("order") && ["ec", "latest", "popular"].includes(searchParam.get("order"))) {
+            query += `order=${searchParam.get("order")}&`
+        }
+
+        if (searchParam.has("orientation") && ["horizontal", "vertical"].includes(searchParam.get("orientation"))) {
+            query += `orientation=${searchParam.get("orientation")}&`
+        }
+
+        if (searchParam.has("min_width") && !isNaN(searchParam.get("min_width"))) {
+            query += `min_width=${searchParam.get("min_width")}&`
+        }
+
+        if (searchParam.has("min_height") && !isNaN(searchParam.get("min_height"))) {
+            query += `min_height=${searchParam.get("min_height")}&`
+        }
+
+        if (searchParam.has("colors")) {
+            const validColor = ["grayscale", "transparent", "red", "orange", "yellow", "green", "turquoise", "blue", "lilac", "pink", "white", "gray", "black", "brown"];
+
+            const colorArray = Array.from(new Set(searchParam.getAll("colors")));
+
+            let allValidColor = colorArray.filter((colorele) => {
+                return validColor.includes(colorele);
+            })
+
+            for (let i = 0; i < allValidColor.length; i++) {
+                query += `colors=${allValidColor[i]}&`;
+            }
+        }
+
+        if (status === "full") {
+            navigate(`/${topCat}/search/${inputquery.toLowerCase()}/${query !== "" ? `?${query.slice(0, -1)}` : ""}`);
+        } else {
+            navigate(`/${topCat}/search/${query !== "" ? `?${query.slice(0, -1)}` : ""}`);
+        }
+    }
 
     return <>
         <div className="error-con">
@@ -352,10 +351,20 @@ const Error = () => {
                     <h1>Page not found</h1>
                 </div>
                 <div className="search">
-                    <i className="ri-search-line" onClick={() => { navigatetoUrl() }}></i>
+                    <i className="ri-search-line" onClick={() => {
+                        if (inputquery !== "") {
+                            filterSearchParam("full")
+                        } else {
+                            filterSearchParam("empty")
+                        }
+                    }}></i>
                     <input type="text" placeholder={`Search ${topCat === "images" ? "images , photos , illustartions and vectors" : topCat}`} value={inputquery} onChange={(e) => { setInputQuery(e.target.value) }} onKeyDown={(e) => {
                         if (e.key === "Enter") {
-                            navigatetoUrl()
+                            if (inputquery !== "") {
+                                filterSearchParam("full")
+                            } else {
+                                filterSearchParam("empty")
+                            }
                         }
                     }} />
                     {size > 750 && <details>

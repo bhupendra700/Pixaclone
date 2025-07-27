@@ -4,7 +4,7 @@ import Footer from '../Page1/Footer'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import Error from '../Error/Error'
 import { auth } from '../Firebase'
 import { onAuthStateChanged } from 'firebase/auth'
@@ -20,6 +20,8 @@ const Page3 = () => {
   useEffect(() => {
     if (safeSearch !== "") localStorage.setItem("safeSearch", safeSearch);
   }, [safeSearch]);
+
+  const [searchParam , setSearchParam] = useSearchParams()
 
   useEffect(() => {
     let queryId = parseInt(id.split('-').pop());
@@ -51,7 +53,9 @@ const Page3 = () => {
 
       let type = ["film", "animation"].includes(singleData.hits[0].type) ? "videos" : singleData.hits[0].type.split("/")[0] + "s"
 
-      type !== cat ? navigate(`/${type}/${customeId}/`, { replace: true }) : customeId !== id ? navigate(`/${type}/${customeId}/`, { replace: true }) : null
+      const prevParam = searchParam.toString();
+      
+      type !== cat ? navigate(`/${type}/${customeId}/${prevParam ? "?" + prevParam : ""}`, { replace: true }) : customeId !== id ? navigate(`/${type}/${customeId}/${prevParam ? "?" + prevParam : ""}`, { replace: true }) : null
     }
   }, [singleData])
 
@@ -87,8 +91,15 @@ const Page3 = () => {
   }, [authTrace])
 
   useEffect(() => {
-    document.title = `${(singleData && singleData.total > 0) ? `${singleData.hits[0].tags.split(",").slice(0, 3).map((word) => word.trim().charAt(0).toUpperCase() + word.trim().slice(1)).join(" ")} - Free ${cat.slice(0, 1).toUpperCase() + cat.slice(1)} on Pixaclone` : `Free ${cat.slice(0, 1).toUpperCase() + cat.slice(1)}`}`;
+    console.log();
+    document.title = `${(singleData && singleData.total > 0) ? `${singleData?.hits[0]?.tags.split(",").slice(0,3).join("").split(" ").map((ele)=> ele.substring(0,1).toUpperCase() + ele.substring(1)).join(" ")} - Free ${cat.slice(0, 1).toUpperCase() + cat.slice(1)} on Pixaclone` : `Free ${cat.slice(0, 1).toUpperCase() + cat.slice(1)}`}`;
   }, [loc.pathname, singleData])
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+    })
+  }, [cat, searchParam, singleData])
 
   if (error) return <Error />
 

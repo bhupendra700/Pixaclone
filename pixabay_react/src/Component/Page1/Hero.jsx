@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import '../../CSS/Page1/hero.css'
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import { signOut } from 'firebase/auth'
@@ -15,6 +15,8 @@ import ForgotPage from '../Login/ForgotPage'
 
 const Hero = ({ setSafeSearch, safeSearch }) => {
     const size = useWindowSize()
+
+    const [searchParam, setSearchParam] = useSearchParams()
 
     const [user, setUser] = useState(null);
 
@@ -193,6 +195,43 @@ const Hero = ({ setSafeSearch, safeSearch }) => {
         }
     }, [authTrace])
 
+    const filterSearchParam = () => {
+        let query = "";
+
+        if (searchParam.has("order") && ["ec", "latest", "popular"].includes(searchParam.get("order"))) {
+            query += `order=${searchParam.get("order")}&`
+        }
+
+        if (searchParam.has("orientation") && ["horizontal", "vertical"].includes(searchParam.get("orientation"))) {
+            query += `orientation=${searchParam.get("orientation")}&`
+        }
+
+        if (searchParam.has("min_width") && !isNaN(searchParam.get("min_width"))) {
+            query += `min_width=${searchParam.get("min_width")}&`
+        }
+
+        if (searchParam.has("min_height") && !isNaN(searchParam.get("min_height"))) {
+            query += `min_height=${searchParam.get("min_height")}&`
+        }
+
+        if (searchParam.has("colors")) {
+            const validColor = ["grayscale", "transparent", "red", "orange", "yellow", "green", "turquoise", "blue", "lilac", "pink", "white", "gray", "black", "brown"];
+
+            const colorArray = Array.from(new Set(searchParam.getAll("colors")));
+
+            let allValidColor = colorArray.filter((colorele) => {
+                return validColor.includes(colorele);
+            })
+
+            for (let i = 0; i < allValidColor.length; i++) {
+                query += `colors=${allValidColor[i]}&`;
+            }
+        }
+
+        query = query.slice(0, -1);
+        return query;
+    }
+
     return <>
         <div className="hero-container">
             {/* background ke liye */}
@@ -210,10 +249,22 @@ const Hero = ({ setSafeSearch, safeSearch }) => {
                         </div>}
                 </NavLink>
                 {size > 330 && <div className="search">
-                    <i className="search-icon ri-search-line" onClick={() => { if (search2 !== "") { navigate(topCat === "All images" ? `/images/search/${search2}` : `/${topCat.substring(0, 1).toLowerCase() + topCat.substring(1)}/search/${search2}`) } }}></i>
+                    <i className="search-icon ri-search-line" onClick={() => {
+                        const query = filterSearchParam();
+                        if (search2 !== "") {
+                            navigate(topCat === "All images" ? `/images/search/${search2.toLowerCase()}/${query ? `?${query}` : ""}` : `/${topCat.toLowerCase()}/search/${search2.toLowerCase()}/${query ? `?${query}` : ""}`)
+                        } else {
+                            navigate(topCat === "All images" ? `/images/search/${query ? `?${query}` : ""}` : `/${topCat.toLowerCase()}/search/${query ? `?${query}` : ""}`)
+                        }
+                    }}></i>
                     <input type="search" placeholder='Search Pixabay' onChange={(e) => { setSearch2(e.target.value) }} value={search2} onKeyDown={(e) => {
-                        if (e.key === "Enter" && search2 !== "") {
-                            navigate(topCat === "All images" ? `/images/search/${search2}` : `/${topCat.substring(0, 1).toLowerCase() + topCat.substring(1)}/search/${search2}`)
+                        if (e.key === "Enter") {
+                            const query = filterSearchParam();
+                            if (search2 !== "") {
+                                navigate(topCat === "All images" ? `/images/search/${search2.toLowerCase()}/${query ? `?${query}` : ""}` : `/${topCat.toLowerCase()}/search/${search2.toLowerCase()}/${query ? `?${query}` : ""}`)
+                            } else {
+                                navigate(topCat === "All images" ? `/images/search/${query ? `?${query}` : ""}` : `/${topCat.toLowerCase()}/search/${query ? `?${query}` : ""}`)
+                            }
                         }
                     }}
                     />
@@ -423,10 +474,22 @@ const Hero = ({ setSafeSearch, safeSearch }) => {
                     <NavLink to={'/videos/'} className="videos cat-div">Videos</NavLink>
                 </div>
                 <div className="hero-main-search">
-                    <i className="ri-search-line" onClick={() => { if (search !== "") { navigate(loc.pathname === "/" ? `/images/search/${search}` : `${loc.pathname}/search/${search}`) } }}></i>
+                    <i className="ri-search-line" onClick={() => {
+                        const query = filterSearchParam()
+                        if (search !== "") {
+                            navigate(loc.pathname === "/" ? `/images/search/${search.toLowerCase()}/${query ? `?${query}` : ""}` : `${loc.pathname}search/${search.toLowerCase()}/${query ? `?${query}` : ""}`)
+                        } else {
+                            navigate(loc.pathname === "/" ? `/images/search/${query ? `?${query}` : ""}` : `${loc.pathname}search/${query ? `?${query}` : ""}`)
+                        }
+                    }}></i>
                     <input placeholder={`Search for ${loc.pathname === "/" ? "photos , vectors & illustrations" : loc.pathname.substring(1, loc.pathname.length - 1)} `} value={search} onChange={(e) => { setSearch(e.target.value) }} type="text" onKeyDown={(e) => {
-                        if (e.key === "Enter" && search !== "") {
-                            navigate(loc.pathname === "/" ? `/images/search/${search}` : `${loc.pathname}/search/${search}`)
+                        if (e.key === "Enter") {
+                            const query = filterSearchParam();
+                            if (search !== "") {
+                                navigate(loc.pathname === "/" ? `/images/search/${search.toLowerCase()}/${query ? `?${query}` : ""}` : `${loc.pathname}search/${search.toLowerCase()}/${query ? `?${query}` : ""}`)
+                            } else {
+                                navigate(loc.pathname === "/" ? `/images/search/${query ? `?${query}` : ""}` : `${loc.pathname}search/${query ? `?${query}` : ""}`)
+                            }
                         }
                     }} />
                     <i className="ri-close-line" onClick={() => { setSearch("") }}></i>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { NavLink, Link, useNavigate, useParams } from 'react-router-dom';
+import { NavLink, Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import useWindowSize from '../useWindowSize';
 import { auth } from '../Firebase';
 import { signOut } from 'firebase/auth';
@@ -13,6 +13,8 @@ import '../../CSS/Page3/header.css'
 const Header = ({ safeSearch, setSafeSearch, authTrace, setAuthTrace, user, setUser }) => {
 
     const size = useWindowSize()
+    const [searchParam, setSearchParam] = useSearchParams()
+
 
     const navigate = useNavigate();
     const { cat } = useParams();
@@ -77,6 +79,48 @@ const Header = ({ safeSearch, setSafeSearch, authTrace, setAuthTrace, user, setU
 
     const [isForgot, setIsForgot] = useState(false)
 
+    const filterSearchParam = (method) => {
+        let query = "";
+
+        if (searchParam.has("order") && ["ec", "latest", "popular"].includes(searchParam.get("order"))) {
+            query += `order=${searchParam.get("order")}&`
+        }
+
+        if (searchParam.has("orientation") && ["horizontal", "vertical"].includes(searchParam.get("orientation"))) {
+            query += `orientation=${searchParam.get("orientation")}&`
+        }
+
+        if (searchParam.has("min_width") && !isNaN(searchParam.get("min_width"))) {
+            query += `min_width=${searchParam.get("min_width")}&`
+        }
+
+        if (searchParam.has("min_height") && !isNaN(searchParam.get("min_height"))) {
+            query += `min_height=${searchParam.get("min_height")}&`
+        }
+
+        if (searchParam.has("colors")) {
+            const validColor = ["grayscale", "transparent", "red", "orange", "yellow", "green", "turquoise", "blue", "lilac", "pink", "white", "gray", "black", "brown"];
+
+            const colorArray = Array.from(new Set(searchParam.getAll("colors")));
+
+            let allValidColor = colorArray.filter((colorele) => {
+                return validColor.includes(colorele);
+            })
+
+            for (let i = 0; i < allValidColor.length; i++) {
+                query += `colors=${allValidColor[i]}&`;
+            }
+        }
+
+        query = query.slice(0, -1);
+
+        if (method === "full") {
+            navigate(`/${topCat}/search/${search.toLowerCase()}/${query ? `?${query}` : ""}`)
+        } else {
+            navigate(`/${topCat}/search/${query ? `?${query}` : ""}`)
+        }
+    }
+
     return <>
         <div className='main-container-x'>
             <header>
@@ -91,12 +135,18 @@ const Header = ({ safeSearch, setSafeSearch, authTrace, setAuthTrace, user, setU
                 {size > 330 && <div className="search">
                     <i className="search-icon ri-search-line" onClick={() => {
                         if (search !== "") {
-                            navigate(`/${topCat}/search/${search.trim()}`)
+                            filterSearchParam("full")
+                        } else {
+                            filterSearchParam("empty")
                         }
                     }}></i>
                     <input type="search" placeholder='Search Pixabay' value={search} onChange={(e) => { setSearch(e.target.value) }} onKeyDown={(e) => {
-                        if (e.key === "Enter" && search !== "") {
-                            navigate(`/${topCat}/search/${search.trim()}`)
+                        if (e.key === "Enter") {
+                            if (search !== "") {
+                                filterSearchParam("full")
+                            } else {
+                                filterSearchParam("empty")
+                            }
                         }
                     }} />
                     {size > 750 && <details>
