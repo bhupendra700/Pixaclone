@@ -129,7 +129,12 @@ const ProfilePage = ({ profile, setProfile, user, setUser, setShowDelete }) => {
         }
     }
 
+    useEffect(() => {
+        console.log("InputFile: ", inputFile);
+        console.log("Link: ", link);
+    }, [link])
 
+    const fileRef = useRef(null);
 
     return <div className="editprofilebox">
         <div className='editprofile'>
@@ -142,9 +147,13 @@ const ProfilePage = ({ profile, setProfile, user, setUser, setShowDelete }) => {
             </div>
             <div className="upload-btn">
                 <label htmlFor='file' className='upload'>Browse Files</label>
-                {inputFile && <button className='remove' onClick={() => { if (!uploading) { handleRemove() } }}><i className="ri-delete-bin-5-fill"></i> Remove</button>}
+                {inputFile && <button className='remove' onClick={(e) => { if (!uploading) { handleRemove(e) } }}><i className="ri-delete-bin-5-fill"></i> Remove</button>}
             </div>
-            <input type="file" accept='image/*' onChange={(e) => { if (!uploading) { handleChange(e) } }} id='file' />
+            <input type="file" accept='image/*' onChange={(e) => { if (!uploading) { handleChange(e) } }} id='file'
+                ref={fileRef}
+                onClick={() => {
+                    fileRef.current.value = null;
+                }} />
             <div className="option">
                 <span></span>
                 <span>Or choose a pattern</span>
