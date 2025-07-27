@@ -91,7 +91,6 @@ const Page3 = () => {
   }, [authTrace])
 
   useEffect(() => {
-    console.log();
     document.title = `${(singleData && singleData.total > 0) ? `${singleData?.hits[0]?.tags.split(",").slice(0,3).join("").split(" ").map((ele)=> ele.substring(0,1).toUpperCase() + ele.substring(1)).join(" ")} - Free ${cat.slice(0, 1).toUpperCase() + cat.slice(1)} on Pixaclone` : `Free ${cat.slice(0, 1).toUpperCase() + cat.slice(1)}`}`;
   }, [loc.pathname, singleData])
 

@@ -88,10 +88,10 @@ const Page2 = () => {
     })
 
     useEffect(() => {
-        if (inView) {
+        if (inView && !isFetching) {
             fetchNextPage()
         }
-    }, [inView])
+    }, [inView , isFetching])
 
     useEffect(() => {
         document.title = `${(data && data.pages[0].total > 0) ? `${data.pages[0].total.toLocaleString("en-IN")} - Free ${cat.slice(0, 1).toUpperCase() + cat.slice(1)} on Pixaclone` : `Free ${cat.slice(0, 1).toUpperCase() + cat.slice(1)} on Pixaclone`}`;
