@@ -56,7 +56,7 @@ const Page1 = () => {
     window.scrollTo({
       top: 0,
     })
-  }, [loc.pathname , data])
+  }, [loc.pathname])
 
   useEffect(() => {
     if (error) {

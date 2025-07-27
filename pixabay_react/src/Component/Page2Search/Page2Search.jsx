@@ -112,7 +112,7 @@ const Page2Search = () => {
         window.scrollTo({
             top: 0,
         })
-    }, [cat, searchParam, data])
+    }, [cat, searchParam , text])
 
     if (error) return <></>
 
