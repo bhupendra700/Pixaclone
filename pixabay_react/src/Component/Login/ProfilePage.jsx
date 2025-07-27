@@ -129,18 +129,13 @@ const ProfilePage = ({ profile, setProfile, user, setUser, setShowDelete }) => {
         }
     }
 
-    useEffect(() => {
-        console.log("InputFile: ", inputFile);
-        console.log("Link: ", link);
-    }, [link])
-
     const fileRef = useRef(null);
 
     return <div className="editprofilebox">
         <div className='editprofile'>
             <div className="headerprofile">
                 <h4>Profile Picture</h4>
-                <i className="ri-close-line" onClick={() => { if (!uploading) { setProfile(!profile); setInputFile(null); setLink(JSON.parse(user?.photoURL).userLink) } }}></i>
+                <i className="ri-close-line" onClick={() => { if (!uploading) { setProfile(!profile); setInputFile(null); setLink(JSON.parse(user?.photoURL).userLink) ; document.body.removeAttribute("class")} }}></i>
             </div>
             <div className="profileimage">
                 {link && <img src={link} alt={"user-img"} />}

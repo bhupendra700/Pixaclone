@@ -49,7 +49,7 @@ const DeletePage = ({ setShowDelete, user }) => {
         <div className="delete-account">
             <div className="delete-header">
                 <h3>Delete account</h3>
-                <i onClick={() => { if (!deleting) { setShowDelete(false) } }} className="ri-close-fill"></i>
+                <i onClick={() => { if (!deleting) { setShowDelete(false); document.body.removeAttribute("class") } }} className="ri-close-fill"></i>
             </div>
             <div className="delete-message">
                 <p><i className="ri-information-2-fill"></i> Are you sure?</p>
@@ -62,7 +62,7 @@ const DeletePage = ({ setShowDelete, user }) => {
                     <input type="password" placeholder='Enter Password' required value={password} onChange={(e) => setPassword(e.target.value)} />
                 </div>}
                 <div className="buttons">
-                    <button className='cancel' type='button' onClick={() => { if (!deleting) { setShowDelete(false) } }}>Cancel</button>
+                    <button className='cancel' type='button' onClick={() => { if (!deleting) { setShowDelete(false); document.body.removeAttribute("class") } }}>Cancel</button>
                     <button className='delete' type='submit' disabled={deleting}>{!deleting ? "Delete Account" : <CircularProgress size={20} color='white' />}</button>
                 </div>
             </form>
