@@ -82,7 +82,7 @@ const Page2 = () => {
             return lastPages.totalHits / 100 > allPages.length ? allPages.length + 1 : undefined;
         },
         staleTime: 1000 * 60 * 20,
-        gcTime: 1000 * 60 * 20,
+        cacheTime: 1000 * 60 * 20,
         placeholderData: keepPreviousData,
         enabled: !!url
     })

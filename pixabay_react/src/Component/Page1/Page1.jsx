@@ -43,8 +43,8 @@ const Page1 = () => {
     queryKey: ["Home", url],
     queryFn: fetchData,
     placeholderData: keepPreviousData,
-    staleTime: 1000 * 60 * 30,
-    gcTime : 1000 * 60 * 30,
+    staleTime: 1000 * 60 * 20,
+    cacheTime: 1000 * 60 * 20,
     enabled : !!url
   })
 

@@ -73,7 +73,8 @@ const Hero = ({ setSafeSearch, safeSearch }) => {
         queryFn: fetchBG,
         enabled: !!url,
         placeholderData: keepPreviousData,
-        staleTime: 1000 * 60 * 30,
+        staleTime: 1000 * 60 * 20,
+        cacheTime: 1000 * 60 * 20,
     })
 
     const [tags, setTags] = useState([]);

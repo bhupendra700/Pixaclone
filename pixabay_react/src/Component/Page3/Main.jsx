@@ -126,7 +126,8 @@ const Main = ({ singleData, safeSearch, setSafeSearch, authTrace, setAuthTrace, 
   const { data, error, fetchNextPage } = useInfiniteQuery({
     queryKey: ["Single_Data", url],
     queryFn: fetchAPI,
-    staleTime: 1000 * 60 * 60,
+    staleTime: 1000 * 60 * 20,
+    cacheTime: 1000 * 60 * 20,
     getNextPageParam: (lastPages, allPages) => {
       return lastPages.totalHits / 30 > allPages.length ? allPages.length + 1 : undefined;
     },

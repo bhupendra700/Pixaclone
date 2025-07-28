@@ -42,7 +42,8 @@ const Page3 = () => {
   const { data: singleData, error } = useQuery({
     queryKey: ["individual_data", url],
     queryFn: fetchAPI,
-    staleTime: 1000 * 60 * 30,
+    staleTime: 1000 * 60 * 20,
+    cacheTime: 1000 * 60 * 20,
     enabled: !!url,
     placeholderData: keepPreviousData,
   })
