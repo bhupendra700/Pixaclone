@@ -37,7 +37,7 @@ const Page2Search = () => {
             query += `&q=${encodeURIComponent(text.trim().replace(/\s+/g, ' '))}`
         }
 
-        query += searchParam.get("order") === "popular" ? "&order=popular" : searchParam.get("order") === "latest" ? "&editors_choice=false&order=latest" : "&editors_choice=true"
+        query += searchParam.get("order") === "popular" ? "&order=popular" : searchParam.get("order") === "ec" ? "&editors_choice=true" :"&editors_choice=false&order=latest"
 
         if (searchParam.has("orientation") && ["horizontal", "vertical"].includes(searchParam.get("orientation"))) {
             query += `&orientation=${searchParam.get("orientation")}`
