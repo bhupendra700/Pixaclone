@@ -92,12 +92,13 @@ PIXACLONE/
 └── README.md                     # Project overview
 
 
+
 🚀 Getting Started (Local Setup)
 1. Clone this repo
 bash
 Copy
 Edit
-git clone https://github.com/your-username/pixaclone.git
+git clone https://github.com/bhupendra700/Pixaclone.git
 cd pixaclone
 2. Install dependencies for both frontend and backend
 bash
