@@ -43,15 +43,15 @@ const Main = ({ data, error, ref, isFetching }) => {
 
   const [sizeFilter, setSizeFilter] = useState({ width: (searchParam.has("min_width") && !isNaN(searchParam.get("min_width"))) ? parseInt(searchParam.get("min_width")) : 0, height: (searchParam.has("min_height") && !isNaN(searchParam.get("min_height"))) ? parseInt(searchParam.get("min_height")) : 0 });
 
- useEffect(() => {
+  useEffect(() => {
     setSizeFilter({ width: (searchParam.has("min_width") && !isNaN(searchParam.get("min_width"))) ? parseInt(searchParam.get("min_width")) : 0, height: (searchParam.has("min_height") && !isNaN(searchParam.get("min_height"))) ? parseInt(searchParam.get("min_height")) : 0 })
-  }, [loc.pathname , searchParam])
+  }, [loc.pathname, searchParam])
 
   const handleSize = (e) => {
     setSizeFilter({ ...sizeFilter, [e.target.name]: e.target.value });
   }
 
-   const handleSubmiteSize = (e) => {
+  const handleSubmiteSize = (e) => {
     e.preventDefault()
 
     let query = "";
@@ -169,7 +169,7 @@ const Main = ({ data, error, ref, isFetching }) => {
     setSearchParam(query)
   }
 
- const handleOrientation = (orientation) => {
+  const handleOrientation = (orientation) => {
     let query = "";
 
     if (searchParam.has("order") && ["ec", "latest", "popular"].includes(searchParam.get("order"))) {
@@ -205,6 +205,14 @@ const Main = ({ data, error, ref, isFetching }) => {
     query = query.slice(0, -1);
 
     setSearchParam(query);
+    if (filter) {
+    const slider = document.querySelector(".slider")
+    slider.classList.add("go")
+    slider.addEventListener('animationend', () => {
+      slider.classList.remove("go")
+      setFilter(!filter)
+    }, { once: true })
+    }
   }
 
   const categoryFilter = (catagoryFil) => {
@@ -241,8 +249,16 @@ const Main = ({ data, error, ref, isFetching }) => {
     }
 
     query = query.slice(0, -1);
-
-    navigate(`/${catagoryFil}/search/${query ? `?${query}` : ""}`)
+    let path = loc.pathname.split("/").slice(2).join("/");
+    navigate(`/${catagoryFil}/${path}${query ? `?${query}` : ""}`)
+    if (filter) {
+    const slider = document.querySelector(".slider")
+    slider.classList.add("go")
+    slider.addEventListener('animationend', () => {
+      slider.classList.remove("go")
+      setFilter(!filter)
+    }, { once: true })
+    }
   }
 
   const orderFilter = (order) => {
@@ -445,13 +461,13 @@ const Main = ({ data, error, ref, isFetching }) => {
                     {searchParam.has("orientation") && ["horizontal", "vertical"].includes(searchParam.get("orientation")) ? searchParam.get("orientation").substring(0, 1).toUpperCase() + searchParam.get("orientation").substring(1) : "Orientation"}<i className="ri-arrow-down-s-line"></i>
                   </summary>
                   <div>
-                    <span className={!searchParam.has("orientation") || (searchParam.get("orientation") !== "horizontal" && searchParam.get("orientation") !== "vartical") ? 'cat-1 green' : 'cat-1'} onClick={() => handleOrientation("any")}>
+                    <span className={!searchParam.has("orientation") || (searchParam.get("orientation") !== "horizontal" && searchParam.get("orientation") !== "vertical") ? 'cat-1 green' : 'cat-1'} onClick={() => handleOrientation("any")}>
                       Any
                     </span>
                     <span className={searchParam.get("orientation") === "horizontal" ? 'cat-1 green' : 'cat-1'} onClick={() => handleOrientation("horizontal")}>
                       Horizontal
                     </span>
-                    <span className={searchParam.get("orientation") === "vartical" ? 'cat-3 green' : 'cat-3'} onClick={() => handleOrientation("vartical")}>
+                    <span className={searchParam.get("orientation") === "vertical" ? 'cat-3 green' : 'cat-3'} onClick={() => handleOrientation("vertical")}>
                       Vertical
                     </span>
                   </div>
@@ -671,13 +687,13 @@ const Main = ({ data, error, ref, isFetching }) => {
                     {searchParam.has("orientation") && ["horizontal", "vertical"].includes(searchParam.get("orientation")) ? searchParam.get("orientation").substring(0, 1).toUpperCase() + searchParam.get("orientation").substring(1) : "Orientation"}<i className="ri-arrow-down-s-line"></i>
                   </summary>
                   <div>
-                    <span className={!searchParam.has("orientation") || (searchParam.get("orientation") !== "horizontal" && searchParam.get("orientation") !== "vartical") ? 'cat-1 green' : 'cat-1'} onClick={() => handleOrientation("any")}>
+                    <span className={!searchParam.has("orientation") || (searchParam.get("orientation") !== "horizontal" && searchParam.get("orientation") !== "vertical") ? 'cat-1 green' : 'cat-1'} onClick={() => handleOrientation("any")}>
                       Any
                     </span>
                     <span className={searchParam.get("orientation") === "horizontal" ? 'cat-1 green' : 'cat-1'} onClick={() => handleOrientation("horizontal")}>
                       Horizontal
                     </span>
-                    <span className={searchParam.get("orientation") === "vartical" ? 'cat-3 green' : 'cat-3'} onClick={() => handleOrientation("vartical")}>
+                    <span className={searchParam.get("orientation") === "vertical" ? 'cat-3 green' : 'cat-3'} onClick={() => handleOrientation("vertical")}>
                       Vertical
                     </span>
                   </div>
@@ -897,13 +913,13 @@ const Main = ({ data, error, ref, isFetching }) => {
                     {searchParam.has("orientation") && ["horizontal", "vertical"].includes(searchParam.get("orientation")) ? searchParam.get("orientation").substring(0, 1).toUpperCase() + searchParam.get("orientation").substring(1) : "Orientation"}<i className="ri-arrow-down-s-line"></i>
                   </summary>
                   <div>
-                    <span className={!searchParam.has("orientation") || (searchParam.get("orientation") !== "horizontal" && searchParam.get("orientation") !== "vartical") ? 'cat-1 green' : 'cat-1'} onClick={() => handleOrientation("any")}>
+                    <span className={!searchParam.has("orientation") || (searchParam.get("orientation") !== "horizontal" && searchParam.get("orientation") !== "vertical") ? 'cat-1 green' : 'cat-1'} onClick={() => handleOrientation("any")}>
                       Any
                     </span>
                     <span className={searchParam.get("orientation") === "horizontal" ? 'cat-1 green' : 'cat-1'} onClick={() => handleOrientation("horizontal")}>
                       Horizontal
                     </span>
-                    <span className={searchParam.get("orientation") === "vartical" ? 'cat-3 green' : 'cat-3'} onClick={() => handleOrientation("vartical")}>
+                    <span className={searchParam.get("orientation") === "vertical" ? 'cat-3 green' : 'cat-3'} onClick={() => handleOrientation("vertical")}>
                       Vertical
                     </span>
                   </div>
@@ -1051,7 +1067,7 @@ const Main = ({ data, error, ref, isFetching }) => {
       </div>
     </div>
     <div className="middle">
-      <h2 style={{textTransform : "capitalize"}}>{data && data.pages[0].total.toLocaleString("en-IN")} Free {text} {cat}</h2>
+      <h2 style={{ textTransform: "capitalize" }}>{data && data.pages[0].total.toLocaleString("en-IN")} Free {text} {cat}</h2>
     </div>
     <div className="lower">
       <div className="lower-heading">Royalty-free vectors</div>
