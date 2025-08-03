@@ -1,9 +1,8 @@
-# 🖼️ Pixaclone — A Pixabay Clone Using React, Firebase & Pixabay API
+# 🖼️ Pixora — A Pixabay Clone Using React, Firebase & Pixabay API
 
-[🌐 Live Demo](https://pixaclonefree.netlify.app/) | 🔁 Backend hosted on Render
+[🌐 Live Demo](https://pixorafree.netlify.app/) | 🔁 Backend hosted on Render
 
-Pixaclone is a **royalty-free image and video search platform** inspired by Pixabay. It allows users to **search, view, filter, download, upload profile images**, and manage their accounts in a beautiful, responsive, and performant interface.
-
+Pixora is a **royalty-free image and video search platform** inspired by Pixabay. It allows users to **search, view, filter, download, upload profile images**, and manage their accounts in a beautiful, responsive, and performant interface.
 
 ---
 
@@ -51,7 +50,7 @@ Pixaclone is a **royalty-free image and video search platform** inspired by Pixa
 | React Router DOM | Routing                                |
 | SCSS             | Styling                                |
 | Express.js       | Backend for uploads                    |
-| Node js          | Backend for uploads                     |
+| Node js          | Backend for uploads                    |
 | Netlify          | Frontend Hosting                       |
 | Render           | Backend Hosting                        |
 
@@ -59,8 +58,8 @@ Pixaclone is a **royalty-free image and video search platform** inspired by Pixa
 
 ## 📁 Folder Structure (Frontend)
 
-PIXACLONE/
-├── pixabay_backend/               # Backend (Express.js for profile upload/delete)
+PIXORA/
+├── pixora_backend/               # Backend (Express.js for profile upload/delete)
 │   ├── node_modules/
 │   ├── uploads/                   # Uploaded profile images
 │   ├── .env
@@ -69,7 +68,7 @@ PIXACLONE/
 │   ├── package.json
 │   └── package-lock.json
 
-├── pixabay_react/                # Frontend (React App)
+├── pixora_frontend/             # Frontend (React App)
 │   ├── node_modules/
 │   ├── public/
 │   ├── src/
@@ -91,28 +90,31 @@ PIXACLONE/
 
 └── README.md                     # Project overview
 
-
+---
 
 🚀 Getting Started (Local Setup)
+
 1. Clone this repo
-bash
-Copy
-Edit
-git clone https://github.com/bhupendra700/Pixaclone.git
-cd pixaclone
-2. Install dependencies for both frontend and backend
+
+```bash
+git clone https://github.com/bhupendra700/Pixora.git
+cd pixora
+Install dependencies for both frontend and backend
+
 bash
 Copy
 Edit
 # For backend
-cd pixabay_backend
+cd pixora_backend
 npm install
 
 # For frontend
-cd ../pixabay_react
+cd ../pixora_frontend
 npm install
-3. Create .env files
-🗂️ pixabay_react/.env (Frontend)
+Create .env files
+
+🗂️ pixora_frontend/.env (Frontend)
+
 env
 Copy
 Edit
@@ -124,45 +126,40 @@ VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
 VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 VITE_FIREBASE_APP_ID=your_app_id
 VITE_BACKEND_URL=http://localhost:5000  # or your deployed backend URL
-🗂️ pixabay_backend/.env (Backend)
+🗂️ pixora_backend/.env (Backend)
+
 env
 Copy
 Edit
 PORT=5000
 UPLOAD_FOLDER=uploads
-4. Start the backend server
-bash
-Copy
-Edit
-cd pixabay_backend
-node app.js
-Or if you're using nodemon, use:
+Start the backend server
 
 bash
 Copy
 Edit
+cd pixora_backend
+node app.js
+# Or with nodemon:
 nodemon app.js
-5. Start the frontend development server
+Start the frontend development server
+
 bash
 Copy
 Edit
-cd ../pixabay_react
+cd ../pixora_frontend
 npm run dev
 Now open http://localhost:5173 in your browser to view the app.
 
-
-| **Feature**           | **Description**                                                            |
-| --------------------- | -------------------------------------------------------------------------- |
-| 🔍 **Search**         | Search high quality royalty-free images/videos from Pixabay                |
-| 📂 **Filters**        | Filter by image type, orientation, category (like Pixabay)                 |
-| 👀 **View**           | View detailed media in responsive layout                                   |
-| ⬇️ **Download**       | Download images/videos in high quality using Blob URLs                     |
-| 📤 **Profile Upload** | Upload/update profile image (for logged-in users)                          |
-| ❌ **Delete Image**   | Delete profile image via backend                                           |
-| 🔑 **Auth Flow**      | Login, Signup, Forgot Password, Account Deletion (Firebase Authentication) |
-| 🔗 **Social Sharing** | Share content via WhatsApp, Facebook, LinkedIn, Twitter, Pinterest, Reddit |
-
-
+Feature	Description
+🔍 Search	Search high quality royalty-free images/videos from Pixabay
+📂 Filters	Filter by image type, orientation, category (like Pixabay)
+👀 View	View detailed media in responsive layout
+⬇️ Download	Download images/videos in high quality using Blob URLs
+📤 Profile Upload	Upload/update profile image (for logged-in users)
+❌ Delete Image	Delete profile image via backend
+🔑 Auth Flow	Login, Signup, Forgot Password, Account Deletion (Firebase Authentication)
+🔗 Social Sharing	Share content via WhatsApp, Facebook, LinkedIn, Twitter, Pinterest, Reddit
 
 🙋‍♂️ Author
 Developed with 💻 and ☕ by Bhupendra Yadav
