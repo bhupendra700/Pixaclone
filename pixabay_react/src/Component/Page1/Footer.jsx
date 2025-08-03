@@ -1,4 +1,3 @@
-import React from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import '../../CSS/Page1/footer.css'
 
@@ -21,7 +20,7 @@ const Footer = () => {
                 <i className="ri-facebook-fill"></i>
             </NavLink>
         </div>
-        <p>© 2025 Pixaclone. Built for educational use only.</p>
+        <p>© 2025 Pixora. Built for educational use only.</p>
     </footer>
 }
 

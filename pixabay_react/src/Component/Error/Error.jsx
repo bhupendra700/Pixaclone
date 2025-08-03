@@ -180,10 +180,10 @@ const Error = () => {
             <header className='error-header'>
                 <Link to={'/'} className="logo">
                     {size <= 750 ? <div className="short">
-                        pc
+                        px
                     </div> :
                         <div className="long">
-                            Pixaclone
+                            Pixora
                         </div>}
                 </Link>
                 <div className="auth">
@@ -382,7 +382,7 @@ const Error = () => {
                 </div>
             </main>
             <footer className='error-footer'>
-                <h2><Link className='link' to={'/'}>Pixaclone</Link></h2>
+                <h2><Link className='link' to={'/'}>Pixora</Link></h2>
                 <div className="social">
                     <NavLink className={"icon insta"} to={'https://www.instagram.com/pixabay/'} target='_blank'>
                         <i className="ri-instagram-fill"></i>
@@ -397,7 +397,7 @@ const Error = () => {
                         <i className="ri-facebook-fill"></i>
                     </NavLink>
                 </div>
-                <p>© 2025 Pixaclone. Built for educational use only.</p>
+                <p>© 2025 Pixora. Built for educational use only.</p>
             </footer>
         </div>
 
