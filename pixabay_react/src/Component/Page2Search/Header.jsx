@@ -161,10 +161,10 @@ const Header = ({ safeSearch, setSafeSearch }) => {
             <header>
                 <NavLink to={'/'} className="logo">
                     {size <= 750 ? <div className="short">
-                        pc
+                        px
                     </div> :
                         <div className="long">
-                            Pixaclone
+                            Pixora
                         </div>}
                 </NavLink>
                 {size > 330 && <div className="search">

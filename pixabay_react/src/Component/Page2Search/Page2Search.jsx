@@ -106,7 +106,7 @@ const Page2Search = () => {
     }, [inView])
 
     useEffect(() => {
-        document.title = `${(data && data.pages[0].total > 0) ? `${data.pages[0].total.toLocaleString("en-IN")} - Free ${text.trim().replace(/\s+/g , ' ').split(" ").map((ele)=> ele.substring(0,1).toUpperCase()+ele.substring(1)).join(" ")} ${cat.slice(0, 1).toUpperCase() + cat.slice(1)} on Pixaclone` : `Free ${cat.slice(0, 1).toUpperCase() + cat.slice(1)} on Pixaclone`}`;
+        document.title = `${(data && data.pages[0].total > 0) ? `${data.pages[0].total.toLocaleString("en-IN")} - Free ${text.trim().replace(/\s+/g , ' ').split(" ").map((ele)=> ele.substring(0,1).toUpperCase()+ele.substring(1)).join(" ")} ${cat.slice(0, 1).toUpperCase() + cat.slice(1)} on Pixora` : `Free ${cat.slice(0, 1).toUpperCase() + cat.slice(1)} on Pixora`}`;
     }, [loc.pathname, data])
 
     useEffect(() => {

@@ -5,7 +5,7 @@ import '../../CSS/Page1/footer.css'
 const Footer = () => {
     return <footer className='footer'>
         <h2>
-            <Link className='link' to={'/'}>Pixaclone</Link>
+            <Link className='link' to={'/'}>Pixora</Link>
         </h2>
         <div className="social">
             <NavLink className={"icon insta"} to={'https://www.instagram.com/pixabay/'} target='_blank'>

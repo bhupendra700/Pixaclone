@@ -1,7 +1,6 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import '../../CSS/Page1/main.css'
-import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
-import { GlobalContext } from '../../App'
+import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import useWindowSize from '../useWindowSize'
 
 const Main = ({ data }) => {
